@@ -1,0 +1,76 @@
+::ng-deep .p-splitter-horizontal>.p-splitter-gutter{
+    background-color: #231F20;
+}
+
+::ng-deep .p-splitter {
+    border: 1px solid #231F20;
+    background: #ffffff;
+    border-radius: 13px;
+    color: #323130;
+}
+
+::ng-deep .p-toast-top-right {
+    top: 63px;
+    right: 20px;
+    background: #dacaaa;
+}
+
+.cart-items-container {
+    max-height: 34.8rem; /* Adjust the maximum height as needed */
+    overflow-y: auto;
+}
+
+
+.grid-container {
+    display: grid;
+    padding: 5px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-gap: 20px;
+    overflow-y: auto; /* Set overflow-y to auto to enable vertical scrolling */
+    max-height: 34.8rem; /* Set maximum height for the grid container */
+}
+
+.card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.quantity {
+    display: flex;
+    align-items: center;
+}
+
+.quantity button {
+    margin: 0 5px;
+}
+
+/* CSS styles for the printed table */
+.print-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.print-table th,
+.print-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.print-table th {
+    background-color: #dacaaa;
+}
+
+.print-table tbody tr:nth-child(even) {
+    background-color: #dacaaa;
+}
+
+.print-table tbody tr:hover {
+    background-color: #dacaaa;
+}

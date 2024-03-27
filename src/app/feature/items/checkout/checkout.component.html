@@ -1,0 +1,162 @@
+<div
+    class="container-fluid justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+
+    <div class="card">
+
+        <h3 class="mb-3" style="margin-left: 20px; margin-top: 20px;">Checkout</h3>
+
+        <p-toast></p-toast>
+
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 20px;">
+            <div style="margin-left: 16px">
+                <label for="example-text-input" class="col-md-8 col-form-label">Search By Name</label>
+                <div class="col-md-12">
+                    <input class="form-control" type="text" placeholder="Search by name" [(ngModel)]="nameSearchQuery"
+                        (input)="searchProductsByName()">
+                </div>
+            </div>
+
+            <div style="margin-left: 16px">
+                <label for="example-text-input" class="col-md-8 col-form-label">Search By Qrcode</label>
+                <div class="col-md-12" style="position: relative;">
+                    <input class="form-control" type="text" [(ngModel)]="barcodeSearchQuery" (input)="searchProductsByCode()" placeholder="Search by Qrcode">
+                    <i class="pi pi-qrcode" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);"></i>
+                </div>
+                
+            </div>
+
+            <div style="margin-left: 16px">
+                <div class="form-check mb-3" style="margin-top: 43px;">
+                    <input class="form-check-input" type="checkbox" id="formCheck1" [(ngModel)]="showInStockOnly"
+                        (change)="filterProducts()">
+                    <label class="form-check-label" for="formCheck1">
+                        Show only items in stock
+                    </label>
+                </div>
+            </div>
+
+            <div></div>
+        </div>
+
+
+        <div style="margin-left: 20px; margin-right: 20px;">
+            <p-splitter [panelSizes]="[65, 35]" [style]="{ height: '35rem' }" styleClass="mb-5">
+                <ng-template pTemplate>
+                    <div class="col flex align-items-center justify-content-center">
+                        <div class="grid-container">
+                            <div *ngFor="let product of filteredProducts" class="card">
+                                <img src="../../../../assets/bamboo-watch.jpg" class="card-img-top" alt="Product Image">
+                                <div class="card-body">
+                                    <div style="display: flex;">
+                                        <h5 class="card-title">{{ product.name }}</h5>
+                                        <p class="card-text" style="margin-left: auto;">Price: ${{ product.price }}</p>
+                                    </div>
+                                    <div style="display: flex;">
+                                        <p class="card-text" style="margin-left: auto;" *ngIf="product.quantity > 0">
+                                            Stock: {{ product.quantity }}</p>
+                                        <p class="card-text" style="margin-left: auto;" *ngIf="product.quantity == 0">
+                                            Stock:
+                                            <p-tag [value]="OUTOFSTOCK" [severity]="'danger'"></p-tag>
+                                        </p>
+                                    </div>
+
+                                    <div class="quantity" *ngIf="product.quantity > 0">
+                                        <button type="button" class="btn btn-dark px-2.5" [disabled]="product.quantity === 0"
+                                            (click)="removeFromCart(product)">-</button>
+                                        <!-- <span>{{ product.quantityInCart }}</span> -->
+                                        <button type="button" class="btn btn-primary px-2.5" (click)="addToCart(product)"
+                                            [disabled]="product.quantityInCart >= product.quantity ">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate>
+                    <div class="col flex align-items-center justify-content-center">
+                        <div class="card" style="max-height: 35.3rem; overflow-y: auto;">
+                            <div class="card-body">
+                                <h3>Cart Items</h3>
+                                <div class="cart-items-container">
+                                    <div *ngFor="let item of cart" class="cart-item"
+                                        (mouseenter)="showDeleteIcon(item.id)" (mouseleave)="hideDeleteIcon()">
+                                        <div class="row mb-2">
+                                            <div class="col-6">{{ item.name }}</div>
+                                            <div class="col-2">{{ item.price | currency }}</div>
+                                            <div class="col-2">
+                                                <!-- <button class="btn btn-dark btn-sm" [disabled]="item.quantity === 0"
+                                                (click)="decreaseQuantity(item)">-</button> -->
+                                                <span class=" px-2.5">{{ item.quantity }}</span>
+                                                <!-- <button class="btn btn-primary btn-sm"
+                                                    (click)="increaseQuantity(item)">+</button> -->
+                                            </div>
+                                            <div class="col-2">{{ getTotalItemPrice(item) | currency }}</div>
+                                            <div class="delete-icon-container" style="position: absolute;">
+                                                <button pButton type="button" icon="pi pi-trash" class="p-button-danger"
+                                                    *ngIf="item.id === hoveredItemId"
+                                                    (click)="removeFromCart(item)"></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-8">Total Items: {{ getTotalItems() }}</div>
+                                    <div class="col-4">Total Price: {{ getTotalPrice() | currency }}</div>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <button class="btn btn-primary" (click)="showDialog()">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+
+            </p-splitter>
+        </div>
+    </div>
+</div>
+
+<p-dialog header="Add New Product" [(visible)]="visible" [modal]="true" [style]="{ width: '50vw' }" [draggable]="false"
+    [resizable]="false">
+
+    <div class="modal-body">
+        <form>
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="regularUserCheckbox" name="regularUser"
+                            [(ngModel)]="regularUser">
+                        <label class="form-check-label" for="regularUserCheckbox">Regular User</label>
+                    </div>
+
+                    <div *ngIf="!regularUser" class="mb-3">
+                        <label class="control-label">Client Name</label>
+                        <input class="form-control" placeholder="Enter ClientName" type="text" name="clientName"
+                            autocomplete="off" [(ngModel)]="ClientName" required />
+                    </div>
+
+
+                    <div *ngIf="regularUser" class="mb-3" id="regularUserDropdown">
+                        <label class="control-label">Client Name</label>
+                        <select class="form-select" name="dropdown" [(ngModel)]="ClientName">
+                            <option>Select</option>
+                            <option *ngFor="let client of clients" [value]="client.id">{{ client.name }}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="control-label">Payment Received</label>
+                        <input class="form-control" placeholder="Enter Payment Received" type="number"
+                            name="paymentReceived" [(ngModel)]="paymentReceived" autocomplete="off" required />
+                    </div>
+
+                    <button type="button" class="btn btn-dark" style="margin-right: 10px;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-event"
+                        (click)="saveProduct()">Proceed</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</p-dialog>

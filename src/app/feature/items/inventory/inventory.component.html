@@ -1,0 +1,332 @@
+<div
+    class="container-fluid justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+
+    <div class="card">
+
+        <h3 class="mb-3" style="margin-left: 20px; margin-top: 20px;">Inventory</h3>
+
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));">
+            <div style="margin-left: 16px">
+                <label for="example-text-input" class="col-md-8 col-form-label">Search for products</label>
+                <div class="col-md-12">
+                    <input class="form-control" type="text" placeholder="Search" [(ngModel)]="productToSearch"
+                        (input)="filterProductsByName()">
+                </div>
+            </div>
+
+            <div style="margin-top: 40px; margin-left: 20px;">
+                <input type="checkbox" [(ngModel)]="showOutOfStock" (change)="StockProductsChange()"> Show Out of Stock
+                Products
+            </div>
+
+
+            <div style="display: flex; margin-top: auto; margin-left: auto; margin-right: 20px;">
+                <h4>Total Items :</h4>&nbsp;&nbsp;<h4>{{items}}</h4>
+            </div>
+
+            <div style="margin-top: auto">
+                <button type="button" class="btn btn-dark" (click)="showDialog()">
+                    <i class="pi pi-plus"></i> &nbsp;Add New Product</button>
+            </div>
+
+
+        </div>
+        <div *ngFor="let product of inventoryproducts">
+            <h2>Product Name: {{ product.product.productname }}</h2>
+            <p>Product Code: {{ product.product.code }}</p>
+            <p>Price: {{ product.product.price }}</p>
+            <p>Stock: {{ product.product.stock }}</p>
+            <img [src]="product.image" alt="{{ product.product.productname }} Image">
+        </div>
+
+
+        <div>
+            <p-dataView #dv [value]="filteredProducts " [rows]="6" [paginator]="true" [layout]="layout">
+                <ng-template pTemplate="header">
+                    <div style="display: flex; background-color: #231F20; ">
+                        <div style="margin-left: auto;margin-right: 10px; padding: 10px;">
+                            <p-dataViewLayoutOptions [layout]="layout"></p-dataViewLayoutOptions>
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template let-product pTemplate="list" let-products>
+                    <div class="grid grid-nogutter">
+                        <div class="col-12" *ngFor="let product of products; let first = first">
+                            <div class="align-items-start p-4 gap-4"
+                                style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));"
+                                [ngClass]="{ 'border-top-1 surface-border': !first }">
+                                <img class="w-80 h-52 shadow-2 block xl:block mx-auto border-round" *ngFor="let val of product"
+                                    [src]=" val.Type"
+                                    [alt]="val.Name" />
+                                <div
+                                    class="justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
+                                    <div class="align-items-center sm:align-items-start gap-3" style="display: flex;">
+                                        <div class="text-2xl font-bold text-900">{{ product.name }}</div>
+                                        <div class="flex align-items-center gap-3" style="margin-left: auto;">
+                                            <i class="pi pi-qrcode" style="margin-right: 10px; margin-bottom: 15px;"
+                                                (click)="printBarcode(product.code,product.quantity)"
+                                                pTooltip="{{ product.code }}"></i>
+
+                                            <!-- <div>
+                                                <qrcode [qrdata]="product.code" [width]="100"
+                                                    [errorCorrectionLevel]="'M'"></qrcode>
+                                            </div> -->
+
+                                            <button pButton icon="pi pi-ellipsis-h"
+                                                class="md:align-self-end mb-2 p-button-rounded"
+                                                style="margin-left: auto; margin-right: 2rem;"
+                                                (click)="tb.toggle($event)"></button>
+
+                                            <p-overlayPanel #tb placement="bottom-end">
+                                                <a class="dropdown-item edit-list"
+                                                    (click)="showUpdateDialog(product.id)" data-edit-id="8"><i
+                                                        class="pi pi-pencil text-success me-1"></i>
+                                                    Update</a>
+                                                <a (click)="showViewDialog(product.id, product.quantity)"
+                                                    class="dropdown-item edit-list" data-edit-id="8"><i
+                                                        class="pi pi-th-large text-primary me-1"></i>
+                                                    Update
+                                                    Stock</a>
+                                                <a (click)="deleteDialog(product.id)" class="dropdown-item remove-list"
+                                                    data-remove-id="8"><i class="pi pi-trash text-danger me-1"></i>
+                                                    Delete</a>
+                                            </p-overlayPanel>
+
+                                        </div>
+                                    </div>
+                                    <div class="align-items-center sm:align-items-end gap-3 sm:gap-2 mt-4"
+                                        style="display: flex;">
+                                        <div>
+                                            <div *ngIf="product.quantity == 0">
+                                                <p-tag [value]="OUTOFSTOCK" [severity]="'danger'"></p-tag>
+                                            </div>
+                                            <div *ngIf="product.quantity >= 10">
+                                                <p-tag [value]="INSTOCK" [severity]="'success'"></p-tag>
+                                            </div>
+                                            <div *ngIf="product.quantity >= 1 && product.quantity <= 10">
+                                                <p-tag [value]="LOWSTOCK" [severity]="'warning'"></p-tag>
+                                            </div>
+                                            <div>
+                                                <label>Stock Available : {{product.quantity}}</label>
+                                            </div>
+
+                                        </div>
+                                        <div style="margin-left: auto; margin-right: 2rem;">
+                                            <span class="text-2xl font-semibold">{{ product.price + 'Pkr' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-template let-products pTemplate="grid">
+                    <div style="display:grid ;grid-template-columns: repeat(3, minmax(0, 1fr))">
+                        <div class="col-12" *ngFor="let item of products; let first = first">
+                            <div class="flex flex-column xl:flex-row xl:align-items-start p-4 gap-4"
+                                [ngClass]="{ 'border-top-1 surface-border': !first }">
+                                <img class="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round"
+                                    [src]="'https://primefaces.org/cdn/primeng/images/demo/product/' + item.image"
+                                    [alt]="item.name" />
+                                <div>
+                                    <div style="display: flex;" class="mt-2">
+                                        <div class="text-2xl font-bold text-900">{{ item.name }}</div>
+                                        <div class="flex align-items-center gap-3" style="margin-left: 1rem;">
+                                            <div *ngIf="item.quantity == 0">
+                                                <p-tag [value]="OUTOFSTOCK" [severity]="'danger'"></p-tag>
+                                            </div>
+                                            <div *ngIf="item.quantity >= 10">
+                                                <p-tag [value]="INSTOCK" [severity]="'success'"></p-tag>
+                                            </div>
+                                            <div *ngIf="item.quantity >= 1 && item.quantity <= 10">
+                                                <p-tag [value]="LOWSTOCK" [severity]="'warning'"></p-tag>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="align-items-center sm:align-items-end gap-3 sm:gap-2"
+                                        style="display: flex;">
+                                        <span class="text-2xl font-semibold">{{ '$' + item.price }}</span>
+                                        <button pButton icon="pi pi-ellipsis-h"
+                                            class="md:align-self-end mb-2 p-button-rounded"
+                                            (click)="tb.toggle($event)"></button>
+
+                                        <p-overlayPanel #tb placement="bottom-end">
+                                            <a class="dropdown-item edit-list" (click)="showUpdateDialog(item.id)"
+                                                data-edit-id="8"><i class="pi pi-pencil text-success me-1"></i>
+                                                Update</a>
+                                            <a (click)="showViewDialog(item.id, item.quantity)"
+                                                class="dropdown-item edit-list" data-edit-id="8"><i
+                                                    class="pi pi-th-large text-primary me-1"></i>
+                                                Update
+                                                Stock</a>
+                                            <a (click)="deleteDialog(item.id)" class="dropdown-item remove-list"
+                                                data-remove-id="8"><i class="pi pi-trash text-danger me-1"></i>
+                                                Delete</a>
+                                        </p-overlayPanel>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-dataView>
+        </div>
+
+    </div>
+</div>
+
+<p-dialog header="Add New Product" [(visible)]="visible" [modal]="true" [style]="{ width: '50vw' }" [draggable]="false"
+    [resizable]="false">
+
+    <div class="modal-body">
+        <form>
+            <div>
+                <p-steps [model]="stepsitems" [readonly]="false" 
+                [activeIndex]="activeIndex" (activeIndexChange)="onActiveIndexChange($event)"></p-steps>
+
+                <div *ngIf="activeIndex == 0">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="control-label">Product Name</label>
+                                <input class="form-control" placeholder="Enter Product Name" type="text" name="title"
+                                    [(ngModel)]="productName" autocomplete="off" required />
+                            </div>
+        
+                            <div class="mb-3">
+                                <label class="control-label">Price</label>
+                                <input class="form-control" placeholder="Enter Price" type="number" name="title"
+                                    [(ngModel)]="productPrice" autocomplete="off" required />
+                            </div>
+        
+                            <div class="mb-3">
+                                <label class="control-label">Stock</label>
+                                <input class="form-control" placeholder="Enter Stock" type="number" name="title"
+                                    [(ngModel)]="productStock" autocomplete="off" required />
+                            </div>
+        
+                            <div class="mb-3">
+                                <label class="control-label">Barcode</label>
+                                <input class="form-control" placeholder="Enter Barcode" type="number" name="title"
+                                    [(ngModel)]="productBarcode" autocomplete="off" required />
+                            </div>
+
+        
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-dark" style="margin-right: 10px;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-event" (click)="saveProduct()">
+                        Save and move to next Step
+                    </button>
+                </div>
+            </div>
+            <div class="row mb-3" *ngIf="activeIndex == 1">
+                <div class="col-12">
+
+                    <div>
+                        <div class="custom-file-upload">
+                            <p-fileUpload name="file" url="{{url}}" accept="image/*"
+                                maxFileSize="1000000" (onUpload)="handleFileSelect($event)">
+                            </p-fileUpload>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+<p-dialog header="Update Stock of Product" [(visible)]="viewVisible" [modal]="true" [style]="{ width: '50vw' }"
+    [draggable]="false" [resizable]="false">
+
+    <div class="modal-body">
+        <form>
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="mb-3">
+                        <label class="control-label">Add Stock</label>
+                        <input class="form-control" placeholder="Enter Quantity" type="text" name="title"
+                            [(ngModel)]="updateStock" autocomplete="off" required />
+                    </div>
+
+                    <div>
+                        <label>Current Stock Quantity : {{ StockVal }}.</label>
+                    </div>
+
+
+                </div>
+            </div>
+            <div style="margin-left: auto; display: flex;">
+                <button type="button" class="btn btn-dark" style="margin-right: 10px;">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="btn-save-event"
+                    (click)="updateProductStock(StockVal)">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+</p-dialog>
+
+<p-dialog header="Update Product" [(visible)]="updateVisible" [modal]="true" [style]="{ width: '50vw' }"
+    [draggable]="false" [resizable]="false">
+
+    <div class="modal-body">
+        <form>
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="mb-3">
+                        <label class="control-label">Product Name</label>
+                        <input class="form-control" placeholder="Enter Product Name" type="text" name="title"
+                            autocomplete="off" [(ngModel)]="productName" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="control-label">Price</label>
+                        <input class="form-control" placeholder="Enter Price" type="text" name="title"
+                            autocomplete="off" [(ngModel)]="productPrice" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="control-label">Stock</label>
+                        <input class="form-control" placeholder="Enter Stock" type="text" name="title"
+                            autocomplete="off" [(ngModel)]="productStock" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="control-label">Barcode</label>
+                        <input class="form-control" placeholder="Enter Barcode" type="text" name="title"
+                            autocomplete="off" [(ngModel)]="productBarcode" required />
+                    </div>
+
+                    <div *ngIf="UpdateImgToogle">
+                        <div *ngFor="let img of inventoryproductsByID">
+                            <img class="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round"
+                                src="img.image" />
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-danger" style="margin-right: 10px;"
+                                    (click)="UpdateImgToogleFunc()">Update image</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="!UpdateImgToogle">
+                        <div>
+                            <div class="custom-file-upload">
+                                <input type="file" id="fileInput" (change)="onFileSelected($event)" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <button type="button" class="btn btn-dark" style="margin-right: 10px;">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-save-event" (click)="updateProduct()">
+                Save
+            </button>
+        </form>
+    </div>
+</p-dialog>

@@ -1,0 +1,37 @@
+::ng-deep .p-button {
+  background-color: #A47B2C;
+  border-color: #A47B2C;
+  color: white;
+  font-size: 12px;
+  border-radius: 1px;
+}
+
+.custom-file-upload {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+
+
+.custom-file-upload-label {
+  background-color: #A47B2C;
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.custom-file-upload-label:hover {
+  background-color: #A47B2C;
+}
+
+::ng-deep .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background: #A47B2C;
+  border-color: #eff6ff;
+  border-radius: 18px;
+  color: white;
+}
+
+::ng-deep .p-tag {
+  border-radius: 5px;
+}

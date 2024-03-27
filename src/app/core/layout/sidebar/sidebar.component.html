@@ -1,0 +1,65 @@
+<div class="vertical-menu"  style="background-color: #231F20" [ngClass]="{ sidebarPushRight: isActive, collapsed: collapsed }">
+  <div class="container-fluid">
+    <nav class="">
+      <ul class="list-group" id="topnav-menu-content">
+        <li class="list-group-item" [routerLink]="['/home']">
+          <a  [routerLinkActive]="['router-link-active']">
+            <i class="pi pi-home " style=" color: #A47B2C;"></i>&nbsp;
+            <span style=" color: #A47B2C;">&nbsp;Dashboard</span>
+          </a>
+        </li>
+
+        <li class="list-group-item" (click)="addExpandClass('ManageClients')">
+          <a class="dropdown-toggle " style=" color: #A47B2C;"><i
+              class="pi pi-user" style=" color: #A47B2C;"></i>&nbsp;
+            <span>&nbsp;Manage Clients </span> <i class="pi pi-angle-down"></i></a>
+        </li>
+
+        <ng-container *ngIf="showMenu === 'ManageClients'">
+          <div style="background-color: #ebecf0d1;">
+            <li class="list-group" [routerLink]="['/manage_clients/clients']">
+              <a class="list-group-item dropdown-toggle " 
+              [routerLinkActive]="['router-link-active']"> <i class="pi pi-users" style=" color: #A47B2C;"></i>&nbsp;
+                <span style=" color: #A47B2C;">&nbsp;Clients</span></a>
+            </li>
+            <li class="list-group" [routerLink]="['/manage_clients/add_client']">
+              <a class="list-group-item dropdown-toggle " [routerLinkActive]="['router-link-active']">
+                <i class="pi pi-user-plus" style=" color: #A47B2C;"></i>&nbsp;
+                <span style=" color: #A47B2C;">&nbsp;Add Client</span></a>
+            </li>
+          </div>
+        </ng-container>
+
+        <li class="list-group-item" [routerLink]="['/items/bills']">
+          <a  [routerLinkActive]="['router-link-active']" tooltip="Bills"
+            container="body" class=" ">
+            <i class="pi pi-chart-bar" style=" color: #A47B2C;"></i>&nbsp;
+            <span style=" color: #A47B2C;">&nbsp;Bills</span>
+          </a>
+        </li>
+
+        <li class="list-group-item" [routerLink]="['/items/inventory']">
+          <a  [routerLinkActive]="['router-link-active']" tooltip="Inventory"
+            container="body" style=" color: #A47B2C;">
+            <i class="pi pi-truck" style=" color: #A47B2C;"></i>&nbsp;
+            <span>&nbsp;Inventory</span>
+          </a>
+        </li>
+
+        <li class="list-group-item" [routerLink]="['/items/checkout']" (click)="toggleCollapsed()">
+          <a  [routerLinkActive]="['router-link-active']" tooltip="Checkout"
+            container="body" style=" color: #A47B2C;">
+            <i class="pi pi-sign-out" style=" color: #A47B2C;"></i>&nbsp;
+            <span>&nbsp;Checkout</span>
+          </a>
+        </li>
+
+        <div class="toggle-button" [ngClass]="{ collapsed: collapsed }" (click)="toggleCollapsed()">
+          <i class="pi pi-angle-double-{{ collapsed ? 'right' : 'left' }}" style=" color: #A47B2C;"></i>&nbsp;
+          <span style=" color: #A47B2C;">Collapse Sidebar</span>
+        </div>
+        
+      </ul>
+    </nav>
+  </div>
+</div>

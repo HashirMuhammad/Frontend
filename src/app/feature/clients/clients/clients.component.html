@@ -1,0 +1,130 @@
+<div
+    class="container-fluid justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+
+    <div class="card">
+
+        <h3 class="mb-3" style="margin-left: 20px; margin-top: 20px;">Search Clients</h3>
+
+        <div>
+            <div style="margin: 20px;">
+                <p-table #dt2 [showCurrentPageReport]="true" [rowsPerPageOptions]="[10, 25, 50]" [paginator]="true"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [value]="searchClients" dataKey="id" [rows]="10" [rowHover]="true" [showCurrentPageReport]="true"
+                    responsiveLayout="scroll"
+                    [globalFilterFields]="['id','name','emailaddress','phoneno','city','bussniessname','description']">
+                    <ng-template pTemplate="caption" >
+                        <div class="flex">
+                            <span class="p-input-icon-left ml-auto">
+                                <i class="pi pi-search"></i>
+                                <input pInputText type="text"
+                                    (input)="dt2.filterGlobal($event.target.value, 'contains')"
+                                    placeholder="Search keyword" />
+                            </span>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="background-color: #231F20; color: #A47B2C; border-top-left-radius: 10px;min-width: 5rem;"
+                                pSortableColumn="id" >
+                                ID
+                                <p-sortIcon field="id"></p-sortIcon>
+                            </th>
+                            <th style="background-color: #231F20;color: #A47B2C;" pSortableColumn="name">
+                                Client Name
+                                <p-sortIcon field="name"></p-sortIcon>
+                            </th>
+                            <th style="background-color: #231F20;color: #A47B2C;" pSortableColumn="email">
+                                Email Address
+                                <p-sortIcon field="email"></p-sortIcon>
+                            </th>
+                            <th style="background-color: #231F20;color: #A47B2C;" pSortableColumn="phoneNo">
+                                Phone No
+                                <p-sortIcon field="phoneNo"></p-sortIcon>
+                            </th>
+                            <th style="background-color: #231F20;color: #A47B2C;" pSortableColumn="city">
+                                city
+                                <p-sortIcon field="city"></p-sortIcon>
+                            </th>
+                            <th style="background-color: #231F20;color: #A47B2C;" pSortableColumn="bussniessName">
+                                Company
+                                <p-sortIcon field="bussniessName"></p-sortIcon>
+                            </th>
+                            <th  style="background-color: #231F20;color: #A47B2C; border-top-right-radius: 10px;">
+                            </th>
+                        </tr>
+                        <tr>
+                            <th style="background-color: #231F20; border-bottom-left-radius: 10px; border-top: 3px dotted #ebecf0;"></th>
+                            <th style="background-color: #231F20; border-top: 3px dotted #ebecf0;">
+                                <p-columnFilter type="text" field="name" placeholder="Client Name"></p-columnFilter>
+                            </th>
+                            <th style="background-color: #231F20; border-top: 3px dotted #ebecf0;">
+                                <p-columnFilter type="text" field="email" placeholder="Email"></p-columnFilter>
+                            </th>
+                            <th style="background-color: #231F20; border-top: 3px dotted #ebecf0;">
+                                <p-columnFilter type="text" field="phoneNo" placeholder="Phone"></p-columnFilter>
+                            </th>
+                            <th style="background-color: #231F20; border-top: 3px dotted #ebecf0;">
+                                <p-columnFilter type="text" field="city" placeholder="City"></p-columnFilter>
+                            </th>
+                            <th style="background-color: #231F20; border-top: 3px dotted #ebecf0;">
+                                <p-columnFilter type="text" field="bussniessName" placeholder="Bussniess Name"></p-columnFilter>
+                            </th>
+                            <th style="background-color: #231F20; border-bottom-right-radius: 10px; border-top: 3px dotted #ebecf0;"></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-customer>
+                        <tr class="">
+                            <td>
+                                {{customer.ID}}
+                            </td>
+                            <td>
+                                {{customer.name}}
+                            </td>
+                            <td>
+                                {{customer.emailaddress}}
+                            </td>
+                            <td>
+                                {{customer.phoneno}}
+                            </td>
+                            <td>
+                                <div style="display: block;">
+                                    <label>{{customer.city}}</label><br />
+                                    <label>{{customer.country}}</label>
+                                </div>
+                            </td>
+                            <td>
+                                {{customer.bussniessname}}
+                            </td>
+                            <td class="border-bottom-1 border-#ebecf0-100">
+                                <ul class="list-inline font-size-20 contact-links mb-0">
+                                    <li class="list-inline-item">
+                                        <div dropdown class="dropdown">
+                                            <a class="dropdown-toggle card-drop px-2 show" (click)="tb.toggle($event)"
+                                                aria-expanded="true">
+                                                <i class="pi pi-ellipsis-h"></i> </a>
+                                            <p-overlayPanel #tb placement="bottom-end">
+                                                <a href="javascript:void(0);" (click)="editUser(customer.ID)"
+                                                    class="dropdown-item edit-list" data-edit-id="8"><i
+                                                        class="pi pi-pencil text-success me-1"></i> Edit</a>
+                                                <a href="javascript:void(0);" (click)="removeUser(customer.ID)"
+                                                    class="dropdown-item remove-list" data-remove-id="8"><i
+                                                        class="pi pi-trash text-danger me-1"></i> Delete</a>
+                                            </p-overlayPanel>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <div class="absolute">
+  <div class="d-flex align-items-center align-content-center justify-content-center">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+</div> -->

@@ -1,0 +1,27 @@
+<header>
+  <nav class="navbar navbar-expand-md fixed-top shadow-lg">
+    <div class="container-fluid ">
+      <a class="navbar-brand" style="margin-left: 1rem; color: #A47B2C;" [routerLink]="['/']">PMS&nbsp;</a>
+
+      <div class="">
+        <ul class="nav  navbar-nav" style="margin-left: auto;">
+          <li class="nav-item dropdown " dropdown>
+            <a href="javascript:void(0)" id="basic-link" class="nav-link dropdown-toggle" (click)="op.toggle($event)">
+              <i class="pi pi-user " style=" color: #A47B2C;"></i>&nbsp;&nbsp;<span style=" color: #A47B2C;">&nbsp;&nbsp;{{ user | titlecase }} </span> &nbsp;&nbsp;<b class="caret"></b>
+              <i class="pi pi-angle-down " style=" color: #A47B2C;"></i>
+            </a>
+            <p-overlayPanel #op id="basic-link-dropdown" class="dropdown-menu  dropdown-menu-right">
+              <a class="dropdown-item" [routerLink]="['/profile']" routerLinkActive="router-link-active">
+                <i class="pi pi-user " style=" color: #A47B2C;"></i>
+                <span  style=" color: #A47B2C;"> Profile</span>
+              </a>
+              <a href="javascript:void(0);" class="dropdown-item" (click)="onLoggedout()"> <i
+                  class="pi pi-power-off " style=" color: #A47B2C;"></i><span style=" color: #A47B2C;"> Log
+                    Out</span></a>
+            </p-overlayPanel>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>

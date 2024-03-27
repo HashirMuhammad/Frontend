@@ -1,0 +1,49 @@
+::ng-deep .p-inputtext{
+    border-radius: 10px;
+}
+
+::ng-deep .p-datatable .p-datatable-tbody>tr>td {
+    border-bottom: 1px solid #A47B2C;
+  }
+  
+  ::ng-deep .p-paginator .p-paginator-pages .p-paginator-page.p-highlight{
+    background: #A47B2C;
+    border-color: #EFF6FF;
+    border-radius: 18px;
+    color: white;
+  }
+  
+  ::ng-deep .p-paginator .p-dropdown{
+    border-radius: 5px;
+  }
+
+  .product-details {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #A47B2C;
+    border-radius: 5px;
+    background-color: #dacaaa;
+  }
+  
+  .product-details p {
+    margin: 5px 0;
+  }
+
+  .item-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .item-table th,
+  .item-table td {
+    border: 1px solid #231F20;
+    padding: 8px;
+  }
+  
+  .item-table th {
+    background-color: #231F20;
+    color: #A47B2C;
+  }
+  
+  

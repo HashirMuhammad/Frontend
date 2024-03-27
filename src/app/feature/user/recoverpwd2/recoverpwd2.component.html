@@ -1,0 +1,54 @@
+<div class="container-fluid p-0">
+    <div class="row g-0 justify-content-center align-items-center">
+        <div class="col-xl-3">
+            <div class="auth-full-page-content p-md-5  p-4 mt-5" style="background-color: #dacaaa; border-radius: 10px;">
+                <div class="w-100">
+                    <div class="d-flex flex-column h-100">
+                        <div class="my-auto">
+                            <div>
+                                <h5 style="color: #A47B2C;"> Reset Password</h5>
+                            </div>
+
+                            <div class="mt-4">
+                                <div class="alert alert-dark text-center mb-4 text-white" role="alert" >
+                                    Enter your Email and instructions will be sent to you!
+                                </div>
+                                <form [formGroup]="resetForm" (ngSubmit)="onSubmit()">
+                                    @if(error){
+                                    <!-- <alert type="danger" [dismissible]="false">{{ error }}</alert> -->
+                                    }
+                                    <div class="mb-3">
+                                        <label for="useremail">Email</label>
+                                        <input type="email" formControlName="email" [ngClass]="{ 'is-invalid': submitted && f.email.errors }" class="form-control" id="useremail" placeholder="Enter email">
+                                        @if(submitted && f.email.errors){
+                                        <div class="invalid-feedback">
+                                            @if(f.email.errors.required){
+                                            <div>Email is required</div>}
+                                            @if(f.email.errors.email){
+                                            <div>Email must be a valid email address</div>}
+                                        </div>}
+                                    </div>
+
+                                    <div class="text-end">
+                                        <button class="btn btn-primary w-md" type="submit" routerLink="/verify" >Reset</button>
+                                    </div>
+
+                                </form>
+                                <div class="mt-5 text-center">
+                                    <p>Remember It ? <a routerLink="/login" class="fw-medium" style="color: #A47B2C;"> Sign In here</a> </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 mt-md-5 text-center">
+                            <p class="mb-0">©{{year}} PMS. Crafted with <i class="mdi mdi-heart text-danger"></i>
+                                by HashSoft</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end col -->
+    </div>
+    <!-- end row -->
+</div>
+<!-- end container-fluid -->
