@@ -31,19 +31,22 @@
 
 
         </div>
-        <div *ngFor="let product of inventoryproducts">
+        <!-- <div *ngFor="let product of inventoryproducts">
+            <h2>Product ID: {{ product.product.ID }}</h2>
             <h2>Product Name: {{ product.product.productname }}</h2>
             <p>Product Code: {{ product.product.code }}</p>
             <p>Price: {{ product.product.price }}</p>
             <p>Stock: {{ product.product.stock }}</p>
-            <img [src]="product.image" alt="{{ product.product.productname }} Image">
-        </div>
+            <img *ngIf="product.images" [src]="getBase64Image(product.images)" alt="{{ product.product.productname }} Image">
+
+
+        </div> -->
 
 
         <div>
-            <p-dataView #dv [value]="filteredProducts " [rows]="6" [paginator]="true" [layout]="layout">
+            <p-dataView #dv [value]="filteredProducts" [rows]="6" [paginator]="true" [layout]="layout">
                 <ng-template pTemplate="header">
-                    <div style="display: flex; background-color: #231F20; ">
+                    <div style="display: flex; background-color: #231F20;">
                         <div style="margin-left: auto;margin-right: 10px; padding: 10px;">
                             <p-dataViewLayoutOptions [layout]="layout"></p-dataViewLayoutOptions>
                         </div>
@@ -52,25 +55,25 @@
                 <ng-template let-product pTemplate="list" let-products>
                     <div class="grid grid-nogutter">
                         <div class="col-12" *ngFor="let product of products; let first = first">
-                            <div class="align-items-start p-4 gap-4"
-                                style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));"
+                            <div class="align-items-start p-4 gap-4" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+                                 border-bottom:1px solid #f3f2f1;"
                                 [ngClass]="{ 'border-top-1 surface-border': !first }">
-                                <img class="w-80 h-52 shadow-2 block xl:block mx-auto border-round" *ngFor="let val of product"
-                                    [src]=" val.Type"
-                                    [alt]="val.Name" />
+                                <img *ngIf="product.images" class=" shadow-2 block xl:block mx-auto border-round"
+                                    style="width: 12rem !important; height: 10rem !important;"
+                                    [src]="getBase64Image(product.images)"
+                                    alt="{{ product.product.productname }} Image">
+                                <img *ngIf="!product.images" class=" shadow-2 block xl:block mx-auto border-round"
+                                    style="width: 12rem !important; height: 10rem !important;"
+                                    src="../../../../assets/imagenotfound.jpg">
+
                                 <div
                                     class="justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
                                     <div class="align-items-center sm:align-items-start gap-3" style="display: flex;">
-                                        <div class="text-2xl font-bold text-900">{{ product.name }}</div>
+                                        <div class="text-2xl font-bold text-900">{{ product.product.productname }}</div>
                                         <div class="flex align-items-center gap-3" style="margin-left: auto;">
                                             <i class="pi pi-qrcode" style="margin-right: 10px; margin-bottom: 15px;"
-                                                (click)="printBarcode(product.code,product.quantity)"
-                                                pTooltip="{{ product.code }}"></i>
-
-                                            <!-- <div>
-                                                <qrcode [qrdata]="product.code" [width]="100"
-                                                    [errorCorrectionLevel]="'M'"></qrcode>
-                                            </div> -->
+                                                (click)="printBarcode(product.product.code,product.product.stock)"
+                                                pTooltip="{{ product.product.code }}"></i>
 
                                             <button pButton icon="pi pi-ellipsis-h"
                                                 class="md:align-self-end mb-2 p-button-rounded"
@@ -79,40 +82,40 @@
 
                                             <p-overlayPanel #tb placement="bottom-end">
                                                 <a class="dropdown-item edit-list"
-                                                    (click)="showUpdateDialog(product.id)" data-edit-id="8"><i
+                                                    (click)="showUpdateDialog(product.product)" data-edit-id="8"><i
                                                         class="pi pi-pencil text-success me-1"></i>
                                                     Update</a>
-                                                <a (click)="showViewDialog(product.id, product.quantity)"
+                                                <a (click)="showViewDialog(product.product.ID, product.product.stock)"
                                                     class="dropdown-item edit-list" data-edit-id="8"><i
                                                         class="pi pi-th-large text-primary me-1"></i>
                                                     Update
                                                     Stock</a>
-                                                <a (click)="deleteDialog(product.id)" class="dropdown-item remove-list"
-                                                    data-remove-id="8"><i class="pi pi-trash text-danger me-1"></i>
+                                                <a (click)="deleteDialog(product.product.ID)"
+                                                    class="dropdown-item remove-list" data-remove-id="8"><i
+                                                        class="pi pi-trash text-danger me-1"></i>
                                                     Delete</a>
                                             </p-overlayPanel>
-
                                         </div>
                                     </div>
                                     <div class="align-items-center sm:align-items-end gap-3 sm:gap-2 mt-4"
                                         style="display: flex;">
                                         <div>
-                                            <div *ngIf="product.quantity == 0">
+                                            <div *ngIf="product.product.stock == 0">
                                                 <p-tag [value]="OUTOFSTOCK" [severity]="'danger'"></p-tag>
                                             </div>
-                                            <div *ngIf="product.quantity >= 10">
+                                            <div *ngIf="product.product.stock >= 10">
                                                 <p-tag [value]="INSTOCK" [severity]="'success'"></p-tag>
                                             </div>
-                                            <div *ngIf="product.quantity >= 1 && product.quantity <= 10">
+                                            <div *ngIf="product.product.stock >= 1 && product.product.stock <= 10">
                                                 <p-tag [value]="LOWSTOCK" [severity]="'warning'"></p-tag>
                                             </div>
                                             <div>
-                                                <label>Stock Available : {{product.quantity}}</label>
+                                                <label>Stock Available : {{ product.product.stock }}</label>
                                             </div>
-
                                         </div>
                                         <div style="margin-left: auto; margin-right: 2rem;">
-                                            <span class="text-2xl font-semibold">{{ product.price + 'Pkr' }}</span>
+                                            <span class="text-2xl font-semibold">{{ product.product.price + 'Pkr'
+                                                }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -121,45 +124,49 @@
                     </div>
                 </ng-template>
                 <ng-template let-products pTemplate="grid">
-                    <div style="display:grid ;grid-template-columns: repeat(3, minmax(0, 1fr))">
-                        <div class="col-12" *ngFor="let item of products; let first = first">
+                    <div style="display:grid ;grid-template-columns: repeat(3, minmax(0, 1fr));">
+                        <div class="col-12" *ngFor="let item of products; let first = first"
+                            style="border:1px solid #f3f2f1;">
                             <div class="flex flex-column xl:flex-row xl:align-items-start p-4 gap-4"
                                 [ngClass]="{ 'border-top-1 surface-border': !first }">
-                                <img class="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round"
-                                    [src]="'https://primefaces.org/cdn/primeng/images/demo/product/' + item.image"
-                                    [alt]="item.name" />
+                                <img *ngIf="item.images" class=" shadow-2 block xl:block mx-auto border-round" style="width: 12rem !important; height: 10rem !important; justify-content: center !important;
+                                display: flex !important;" [src]="getBase64Image(item.images)"
+                                    alt="{{ item.product.productname }} Image">
+                                <img *ngIf="!item.images" class=" shadow-2 block xl:block mx-auto border-round" style="width: 12rem !important; height: 10rem !important; justify-content: center !important;
+                                display: flex !important;" src="../../../../assets/imagenotfound.jpg">
                                 <div>
                                     <div style="display: flex;" class="mt-2">
-                                        <div class="text-2xl font-bold text-900">{{ item.name }}</div>
-                                        <div class="flex align-items-center gap-3" style="margin-left: 1rem;">
-                                            <div *ngIf="item.quantity == 0">
+                                        <div class="text-2xl font-bold text-900">{{ item.product.productname }}</div>
+                                        <div class="flex align-items-center gap-3"
+                                            style="margin-left: auto !important;">
+                                            <div *ngIf="item.product.stock == 0">
                                                 <p-tag [value]="OUTOFSTOCK" [severity]="'danger'"></p-tag>
                                             </div>
-                                            <div *ngIf="item.quantity >= 10">
+                                            <div *ngIf="item.product.stock >= 10">
                                                 <p-tag [value]="INSTOCK" [severity]="'success'"></p-tag>
                                             </div>
-                                            <div *ngIf="item.quantity >= 1 && item.quantity <= 10">
+                                            <div *ngIf="item.product.stock >= 1 && item.product.stock <= 10">
                                                 <p-tag [value]="LOWSTOCK" [severity]="'warning'"></p-tag>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="align-items-center sm:align-items-end gap-3 sm:gap-2"
-                                        style="display: flex;">
-                                        <span class="text-2xl font-semibold">{{ '$' + item.price }}</span>
+                                        style="display: flex; margin-top: 5px !important;">
+                                        <span class="text-2xl font-semibold">{{ item.product.price + 'Pkr' }}</span>
                                         <button pButton icon="pi pi-ellipsis-h"
                                             class="md:align-self-end mb-2 p-button-rounded"
-                                            (click)="tb.toggle($event)"></button>
+                                            style="margin-left: auto !important;" (click)="tb.toggle($event)"></button>
 
                                         <p-overlayPanel #tb placement="bottom-end">
-                                            <a class="dropdown-item edit-list" (click)="showUpdateDialog(item.id)"
+                                            <a class="dropdown-item edit-list" (click)="showUpdateDialog(item.product)"
                                                 data-edit-id="8"><i class="pi pi-pencil text-success me-1"></i>
                                                 Update</a>
-                                            <a (click)="showViewDialog(item.id, item.quantity)"
+                                            <a (click)="showViewDialog(item.product.ID, item.product.stock)"
                                                 class="dropdown-item edit-list" data-edit-id="8"><i
                                                     class="pi pi-th-large text-primary me-1"></i>
                                                 Update
                                                 Stock</a>
-                                            <a (click)="deleteDialog(item.id)" class="dropdown-item remove-list"
+                                            <a (click)="deleteDialog(item.product.ID)" class="dropdown-item remove-list"
                                                 data-remove-id="8"><i class="pi pi-trash text-danger me-1"></i>
                                                 Delete</a>
                                         </p-overlayPanel>
@@ -181,8 +188,8 @@
     <div class="modal-body">
         <form>
             <div>
-                <p-steps [model]="stepsitems" [readonly]="false" 
-                [activeIndex]="activeIndex" (activeIndexChange)="onActiveIndexChange($event)"></p-steps>
+                <p-steps [model]="stepsitems" [readonly]="false" [activeIndex]="activeIndex"
+                    (activeIndexChange)="onActiveIndexChange($event)"></p-steps>
 
                 <div *ngIf="activeIndex == 0">
                     <div class="row mb-3">
@@ -192,26 +199,26 @@
                                 <input class="form-control" placeholder="Enter Product Name" type="text" name="title"
                                     [(ngModel)]="productName" autocomplete="off" required />
                             </div>
-        
+
                             <div class="mb-3">
                                 <label class="control-label">Price</label>
                                 <input class="form-control" placeholder="Enter Price" type="number" name="title"
                                     [(ngModel)]="productPrice" autocomplete="off" required />
                             </div>
-        
+
                             <div class="mb-3">
                                 <label class="control-label">Stock</label>
                                 <input class="form-control" placeholder="Enter Stock" type="number" name="title"
                                     [(ngModel)]="productStock" autocomplete="off" required />
                             </div>
-        
+
                             <div class="mb-3">
                                 <label class="control-label">Barcode</label>
-                                <input class="form-control" placeholder="Enter Barcode" type="number" name="title"
+                                <input class="form-control" placeholder="Enter Barcode" type="text" name="title"
                                     [(ngModel)]="productBarcode" autocomplete="off" required />
                             </div>
 
-        
+
                         </div>
                     </div>
                     <button type="button" class="btn btn-dark" style="margin-right: 10px;">Cancel</button>
@@ -225,8 +232,8 @@
 
                     <div>
                         <div class="custom-file-upload">
-                            <p-fileUpload name="file" url="{{url}}" accept="image/*"
-                                maxFileSize="1000000" (onUpload)="handleFileSelect($event)">
+                            <p-fileUpload name="file" url="{{url}}" accept="image/*" maxFileSize="1000000"
+                                (onUpload)="handleFileSelect($event)">
                             </p-fileUpload>
                         </div>
 
@@ -247,8 +254,8 @@
             <div class="row mb-3">
                 <div class="col-12">
                     <div class="mb-3">
-                        <label class="control-label">Add Stock</label>
-                        <input class="form-control" placeholder="Enter Quantity" type="text" name="title"
+                        <label class="control-label">Update Stock</label>
+                        <input class="form-control" placeholder="Enter Quantity" type="number" name="title"
                             [(ngModel)]="updateStock" autocomplete="off" required />
                     </div>
 
@@ -262,7 +269,7 @@
             <div style="margin-left: auto; display: flex;">
                 <button type="button" class="btn btn-dark" style="margin-right: 10px;">Cancel</button>
                 <button type="submit" class="btn btn-primary" id="btn-save-event"
-                    (click)="updateProductStock(StockVal)">
+                    (click)="updateProductStock(productId)">
                     Save
                 </button>
             </div>
@@ -285,13 +292,13 @@
 
                     <div class="mb-3">
                         <label class="control-label">Price</label>
-                        <input class="form-control" placeholder="Enter Price" type="text" name="title"
+                        <input class="form-control" placeholder="Enter Price" type="number" name="title"
                             autocomplete="off" [(ngModel)]="productPrice" required />
                     </div>
 
                     <div class="mb-3">
                         <label class="control-label">Stock</label>
-                        <input class="form-control" placeholder="Enter Stock" type="text" name="title"
+                        <input class="form-control" placeholder="Enter Stock" type="number" name="title"
                             autocomplete="off" [(ngModel)]="productStock" required />
                     </div>
 

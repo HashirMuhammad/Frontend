@@ -177,19 +177,19 @@ export class ItemsServiceService {
 
   updateProductStock(productId: string, newStock: string): Observable<any> {
     // Adjust the URL and request payload as per your backend API endpoint
-    const apiUrl = `your_backend_api_url/products/${productId}`;
+    const apiUrl = `${this.apiUrl}/products/${productId}/stock`;
     const payload = { stock: newStock };
     return this.http.put(apiUrl, payload);
   }
 
-  updateProduct(product: any): Observable<any> {
+  updateProduct(product: any,productId: string): Observable<any> {
     // Adjust the URL as per your backend API endpoint
-    const apiUrl = "your_backend_api_url";
-    return this.http.post(apiUrl, product);
+    const apiUrl = `${this.apiUrl}/products/${productId}`;
+    return this.http.put(apiUrl, product);
   }
 
   deleteProduct(productId: number): Observable<any> {
-    const apiUrl = `your_backend_api_url/products/${productId}`;
+    const apiUrl = `${this.apiUrl}/products/${productId}`;
     return this.http.delete(apiUrl);
   }
 

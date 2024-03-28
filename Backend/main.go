@@ -24,6 +24,9 @@ func main() {
 
 	r.HandleFunc("/create_product", CreateProductHandler).Methods("POST")
 	r.HandleFunc("/products", GetAllProductsHandler).Methods("GET")
+	r.HandleFunc("/products/{product_id}/stock", UpdateStockHandler).Methods("PUT")
+	r.HandleFunc("/products/{productID}", UpdateProductHandler).Methods("PUT")
+	r.HandleFunc("/products/{product_id}", DeleteProductHandler).Methods("DELETE")
 
 	// Create a file server instance to serve files from the "static" directory
     fs := http.FileServer(http.Dir("static"))

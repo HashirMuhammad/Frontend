@@ -130,3 +130,76 @@ func getImagesByProductID(productID uint) ([]Image, error) {
     }
     return images, nil
 }
+
+// IsAuthorizedToUpdateProduct checks if the user is authorized to update the specified product
+func IsAuthorizedToUpdateProduct(userID uint, productID int) bool {
+    // Implement your authorization logic here
+    // For example, you might check if the product belongs to the user
+    var product Product
+    if err := Database.First(&product, productID).Error; err != nil {
+        // Product not found
+        return false
+    }
+    return product.UserID == userID
+}
+
+// UpdateProduct updates the specified product in the database
+func UpdateProduct(productID int, updatedProduct *Product) error {
+    // Find the product by ID
+    var product Product
+    if err := Database.First(&product, productID).Error; err != nil {
+        // Product not found
+        return err
+    }
+
+    // Update fields of the product
+    product.ProductName = updatedProduct.ProductName
+    product.Price = updatedProduct.Price
+    product.Stock = updatedProduct.Stock
+
+    // Save the updated product to the database
+    if err := Database.Save(&product).Error; err != nil {
+        // Error occurred while saving
+        return err
+    }
+
+    return nil
+}
+
+
+// DeleteProduct deletes a product by its ID from the database, checking if the product belongs to the user
+func DeleteProduct(productID int, userID uint) error {
+    // Retrieve the product from the database
+    var product Product
+    if err := Database.First(&product, productID).Error; err != nil {
+        return fmt.Errorf("product not found")
+    }
+
+    // Check if the product belongs to the user
+    if product.UserID != userID {
+        return fmt.Errorf("product does not belong to the user")
+    }
+
+    // Start a transaction
+    tx := Database.Begin()
+
+    // Delete the product from the database
+    if err := tx.Delete(&product).Error; err != nil {
+        tx.Rollback()
+        return err
+    }
+
+    // Delete associated images
+    if err := tx.Where("product_id = ?", productID).Delete(&Image{}).Error; err != nil {
+        tx.Rollback()
+        return err
+    }
+
+    // Commit the transaction
+    if err := tx.Commit().Error; err != nil {
+        tx.Rollback()
+        return err
+    }
+
+    return nil
+}

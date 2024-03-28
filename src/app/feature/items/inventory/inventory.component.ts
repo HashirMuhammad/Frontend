@@ -29,36 +29,36 @@ export class InventoryComponent {
   LOWSTOCK = "LOWSTOCK";
   inventoryproducts = [
     {
-      image: "",
+      images: "",
       product: {
         ID: 3,
-        CreatedAt: "2024-03-27T18:55:23.733Z",
-        UpdatedAt: "2024-03-27T18:55:23.733Z",
+        CreatedAt: "",
+        UpdatedAt: "",
         DeletedAt: null,
         UserID: 2,
-        code: "132",
-        productname: "first test",
-        price: "789",
-        stock: "465"
-      },
+        code: "",
+        productname: "",
+        price: "",
+        stock: ""
+      }
     }
   ];
   items: any;
-  inventoryproductsByID = [
-    {
-      id: "",
-      code: "",
-      name: "",
-      image: "",
-      price: 1,
-      quantity: 0
-    }
-  ];
+  // inventoryproductsByID = [
+  //   {
+  //     id: "",
+  //     code: "",
+  //     name: "",
+  //     image: "",
+  //     price: 1,
+  //     quantity: 0
+  //   }
+  // ];
   productName: string;
   productPrice: number;
   productStock: number;
   productBarcode: string;
-  UpdateImgToogle = true;
+  UpdateImgToogle: boolean = true;
   showOutOfStock: boolean = false;
   filteredProducts: any[];
   productToSearch: string;
@@ -75,18 +75,8 @@ export class InventoryComponent {
 
   ngOnInit() {
     // Initialize filteredProducts with all products
-    this.itemsService.getinventoryproducts().subscribe(
-      (data) => {
-        this.inventoryproducts = data;
-        console.log(data);
-      },
-      (error) => {
-        console.error("Error fetching clients:", error);
-      }
-    );
-    this.items = this.inventoryproducts.length;
-    this.filteredProducts = this.inventoryproducts;
-    this.inventoryproductsByID = this.items.inventoryproductsByID;
+    this.getData();
+    // this.inventoryproductsByID = this.items.inventoryproductsByID;
     this.stepsitems = [
       {
         label: "Details"
@@ -98,6 +88,26 @@ export class InventoryComponent {
   }
 
   constructor(private itemsService: ItemsServiceService, private http: HttpClient) {}
+
+  getData(){
+    // Initialize filteredProducts with all products
+    this.itemsService.getinventoryproducts().subscribe(
+      (data) => {
+        this.inventoryproducts = data;
+        console.log(data);
+        this.filteredProducts = this.inventoryproducts;
+      },
+      (error) => {
+        console.error("Error fetching clients:", error);
+      }
+    );
+    this.items = this.inventoryproducts.length;
+  }
+
+  getBase64Image(base64Image: string): string {
+    // Prefix the base64 data with the appropriate MIME type
+    return "data:image/png;base64," + base64Image;
+  }
 
   onActiveIndexChange(event: number) {
     this.activeIndex = event;
@@ -127,22 +137,22 @@ export class InventoryComponent {
     );
   }
 
-  getinventoryproductsByIDData() {
-    this.itemsService.getinventoryproductsByID().subscribe(
-      (data) => {
-        this.inventoryproductsByID = data;
-      },
-      (error) => {
-        console.error("Error fetching clients:", error);
-      }
-    );
-  }
+  // getinventoryproductsByIDData() {
+  //   this.itemsService.getinventoryproductsByID().subscribe(
+  //     (data) => {
+  //       this.inventoryproductsByID = data;
+  //     },
+  //     (error) => {
+  //       console.error("Error fetching clients:", error);
+  //     }
+  //   );
+  // }
 
   filterProductsByName(): void {
     // Perform the filter operation
-    // this.filteredProducts = this.inventoryproducts.filter((product) =>
-    //   product.name.toLowerCase().includes(this.productToSearch.toLowerCase())
-    // );
+    this.filteredProducts = this.inventoryproducts.filter((product) =>
+    product.product.productname.toLowerCase().includes(this.productToSearch.toLowerCase())
+    );
   }
 
   StockProductsChange() {
@@ -154,11 +164,11 @@ export class InventoryComponent {
   }
 
   filterProducts() {
-    // if (this.showOutOfStock) {
-    //   this.filteredProducts = this.inventoryproducts.filter((product) => product.quantity === 0);
-    // } else {
-    //   this.filteredProducts = this.inventoryproducts;
-    // }
+    if (this.showOutOfStock) {
+      this.filteredProducts = this.inventoryproducts.filter((product) => parseInt(product.product.stock) === 0);
+    } else {
+      this.filteredProducts = this.inventoryproducts;
+    }
   }
 
   showDialog() {
@@ -173,8 +183,9 @@ export class InventoryComponent {
     this.viewVisible = true;
   }
 
-  showUpdateDialog(id: number) {
-    console.log(id);
+  showUpdateDialog(product: any) {
+    console.log(product);
+    this.productId = product.ID;
     this.updateVisible = true;
   }
 
@@ -194,8 +205,9 @@ export class InventoryComponent {
         this.productId = response.ID;
         this.activeIndex = 1;
         this.url = `http://localhost:8080/upload/${this.productId}`;
+        this.getData();
         // Optionally, close the dialog or perform any other action upon successful addition
-        this.visible = false;
+        // this.visible = false;
       },
       (error) => {
         console.error("Error adding product:", error);
@@ -204,16 +216,17 @@ export class InventoryComponent {
     );
   }
 
-  updateProductStock(StockVal: any) {
-    const updatedStock = StockVal + this.updateStock; // Calculate the updated stock
+  updateProductStock(id: any) {
+    const updatedStock = this.updateStock.toString(); // Calculate the updated stock
     const productId = this.StockValid; // Replace with the actual product ID
 
     // Call the service method to update the product stock
     this.itemsService.updateProductStock(productId, updatedStock).subscribe(
-      () => {
-        console.log("Stock updated successfully");
+      (response) => {
+        console.log("Stock updated successfully", response);
         // Optionally, close the dialog or perform any other action upon successful update
         this.viewVisible = false;
+        this.getData();
       },
       (error) => {
         console.error("Error updating stock:", error);
@@ -227,27 +240,25 @@ export class InventoryComponent {
   updateProduct() {
     // Gather product data from form fields
     const Product = {
-      productName: this.productName,
-      price: this.productPrice,
-      stock: this.productStock,
-      barcode: this.productBarcode,
-      file: this.uploadedFiles // Assuming selectedFile is the File object
+      productname: this.productName,
+      price: this.productPrice.toString(),
+      stock: this.productStock.toString(),
+      code: this.productBarcode.toString()
     };
 
     // Call the service method to add the product to the backend
-    this.itemsService.updateProduct(Product).subscribe(
+    this.itemsService.updateProduct(Product, this.productId).subscribe(
       (response) => {
         console.log("Product added successfully:", response);
+        this.getData();
         // Optionally, close the dialog or perform any other action upon successful addition
-        this.visible = false;
+        this.updateVisible = false;
       },
       (error) => {
         console.error("Error adding product:", error);
         // Handle error appropriately, e.g., display an error message to the user
       }
     );
-
-    this.visible = false;
   }
 
   onSortChange(event: any) {
@@ -271,6 +282,7 @@ export class InventoryComponent {
     this.itemsService.deleteProduct(id).subscribe(
       () => {
         console.log("Product deleted successfully");
+        this.getData();
         // Optionally, perform any other action upon successful deletion
       },
       (error) => {
