@@ -1,6 +1,7 @@
 import { Component, OnInit, Type } from "@angular/core";
 import { HomeServiceService } from "../home-service.service";
 import { HttpClient } from "@angular/common/http";
+import { ItemsServiceService } from "../../items/items-service.service";
 
 interface UploadEvent {
   originalEvent: Event;
@@ -207,60 +208,18 @@ export class HomeComponent implements OnInit {
   ];
   products = [
     {
-      id: "1",
-      code: "f230fh0g3",
-      name: "Pen",
-      image: "bamboo-watch.jpg",
-      price: 65,
-      quantity: 0
-    },
-    {
-      id: "2",
-      code: "f240fh0g3",
-      name: "Bamboo Watch",
-      image: "bamboo-watch.jpg",
-      price: 65,
-      quantity: 4
-    },
-    {
-      id: "3",
-      code: "f230fh0g3",
-      name: "Bamboo Watch",
-      image: "bamboo-watch.jpg",
-      price: 65,
-      quantity: 24
-    },
-    {
-      id: "4",
-      code: "f230fh0g3",
-      name: "Bamboo Watch",
-      image: "bamboo-watch.jpg",
-      price: 65,
-      quantity: 24
-    },
-    {
-      id: "5",
-      code: "f230fh0g3",
-      name: "Bamboo Watch",
-      image: "bamboo-watch.jpg",
-      price: 65,
-      quantity: 24
-    },
-    {
-      id: "6",
-      code: "f230fh0g3",
-      name: "Bamboo Watch",
-      image: "bamboo-watch.jpg",
-      price: 65,
-      quantity: 24
-    },
-    {
-      id: "7",
-      code: "f230fh0g3",
-      name: "Bamboo Watch",
-      image: "bamboo-watch.jpg",
-      price: 65,
-      quantity: 24
+      images: "",
+      product: {
+        ID: 3,
+        CreatedAt: "",
+        UpdatedAt: "",
+        DeletedAt: null,
+        UserID: 2,
+        code: "",
+        productname: "",
+        price: "",
+        stock: ""
+      }
     }
   ];
   totalSale: number = 1;
@@ -277,14 +236,18 @@ export class HomeComponent implements OnInit {
   monthlybasicOptions: any;
   dailySale: number[] = [];
   monthlySale: number[] = [];
+  updateStock: any;
+  StockValid: string;
+  productLength: number;
 
-  fileSelected : File;
-  imageUrl: string | ArrayBuffer | null = null;
-  imageLoaded: boolean = false;
+  // fileSelected : File;
+  // imageUrl: string | ArrayBuffer | null = null;
+  // imageLoaded: boolean = false;
   
   constructor(
     private homeService: HomeServiceService,
-    private http: HttpClient
+    private itemsService: ItemsServiceService
+    // private http: HttpClient
   ) {
     this.Calculatebil();
     this.dailySale = this.homeService.dailySale;
@@ -298,28 +261,52 @@ export class HomeComponent implements OnInit {
     this.chartmonthly();
   }
 
-  onUpload(event: UploadEvent) {
-    console.log(event.files)
+  // onUpload(event: UploadEvent) {
+  //   console.log(event.files)
+  // }
+
+  // getImage(imageId: number) {
+  //   const backendUrl = `http://localhost:8080/getImage?id=${imageId}`;
+  
+  //   this.http.get(backendUrl, { responseType: 'blob' }).subscribe(
+  //     (response: Blob) => {
+  //       const reader = new FileReader();
+  //       reader.readAsDataURL(response);
+  //       reader.onloadend = () => {
+  //         this.imageUrl = reader.result;
+  //         this.imageLoaded = true;
+  //       };
+  //     },
+  //     error => {
+  //       console.error('Error fetching image:', error);
+  //     }
+  //   );
+  // }
+
+  getBase64Image(base64Image: string): string {
+    // Prefix the base64 data with the appropriate MIME type
+    return "data:image/png;base64," + base64Image;
   }
 
-  getImage(imageId: number) {
-    // Replace 'your_backend_url' with the actual URL of your Golang backend endpoint
-    const backendUrl = `http://localhost:8080/getImage?id=${imageId}`;
-  
-    this.http.get(backendUrl, { responseType: 'blob' }).subscribe(
-      (response: Blob) => {
-        // Convert the Blob to data URL
-        const reader = new FileReader();
-        reader.readAsDataURL(response);
-        reader.onloadend = () => {
-          this.imageUrl = reader.result;
-          this.imageLoaded = true;
-        };
+  updateProductStock(id: any) {
+    const updatedStock = this.updateStock.toString(); // Calculate the updated stock
+    const productId = this.StockValid; // Replace with the actual product ID
+
+    // Call the service method to update the product stock
+    this.itemsService.updateProductStock(productId, updatedStock).subscribe(
+      (response) => {
+        console.log("Stock updated successfully", response);
+        // Optionally, close the dialog or perform any other action upon successful update
+        this.viewVisible = false;
+        this.filterProducts();
       },
-      error => {
-        console.error('Error fetching image:', error);
+      (error) => {
+        console.error("Error updating stock:", error);
+        // Handle error appropriately, e.g., display an error message to the user
       }
     );
+
+    this.viewVisible = false;
   }
   
   Calculatebil() {
@@ -472,13 +459,23 @@ export class HomeComponent implements OnInit {
   }
 
   filterProducts() {
-    this.filteredProducts = this.products.filter((product) => product.quantity === 0);
+    // this.filteredProducts = this.products.filter((product) => product.quantity === 0);
+    this.itemsService.getProductStockZero().subscribe(
+      (data) => {
+        this.filteredProducts = data;
+        this.productLength = this.filteredProducts.length
+      },
+      (error) => {
+        console.error("Error fetching clients:", error);
+      }
+    );
   }
 
-  showViewDialog(val: number) {
-    debugger;
-    this.StockVal = val;
-    console.log(val);
+  showViewDialog(id: string, Val: number) {
+    this.StockValid = id;
+    this.StockVal = Val;
+    console.log(id);
+    console.log(Val);
     this.viewVisible = true;
   }
 

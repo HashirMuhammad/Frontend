@@ -24,15 +24,16 @@ func main() {
 
 	r.HandleFunc("/create_product", CreateProductHandler).Methods("POST")
 	r.HandleFunc("/products", GetAllProductsHandler).Methods("GET")
+	r.HandleFunc("/products/zero-stock", GetProductsByStockHandler).Methods("GET")
 	r.HandleFunc("/products/{product_id}/stock", UpdateStockHandler).Methods("PUT")
 	r.HandleFunc("/products/{productID}", UpdateProductHandler).Methods("PUT")
 	r.HandleFunc("/products/{product_id}", DeleteProductHandler).Methods("DELETE")
 
 	// Create a file server instance to serve files from the "static" directory
-    fs := http.FileServer(http.Dir("static"))
+	fs := http.FileServer(http.Dir("static"))
 
-    // Serve files from the "/static/" route
-    http.Handle("/static/", http.StripPrefix("/static/", fs))
+	// Serve files from the "/static/" route
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	// CORS middleware
 	corsHandler := cors.New(cors.Options{

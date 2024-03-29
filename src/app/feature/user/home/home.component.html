@@ -2,24 +2,20 @@
   class="container-fluid justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
 
   <div class="card">
-    <div class="custom-file-upload">
-      <p-fileUpload name="file" 
-              url="http://localhost:8080/upload" 
-              accept="image/*" 
-              maxFileSize="1000000" 
-              (onUpload)="onUpload($event)">
-</p-fileUpload>
-<button (click)="getImage(1)">Get Image</button>
-<div *ngIf="imageLoaded">
-  <img [src]="imageUrl" alt="Fetched Image">
-</div>
+    <!-- <div class="custom-file-upload">
+      <p-fileUpload name="file" url="http://localhost:8080/upload" accept="image/*" maxFileSize="1000000"
+        (onUpload)="onUpload($event)">
+      </p-fileUpload>
+      <button (click)="getImage(1)">Get Image</button>
+      <div *ngIf="imageLoaded">
+        <img [src]="imageUrl" alt="Fetched Image">
+      </div>
 
-  </div>
+    </div> -->
     <h3 class="mb-3" style="margin-left: 20px; margin-top: 20px;">Dashboard</h3>
 
     <div class="mb-3" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));">
-      <div 
-        style="display: flex; background-color: #231F20;border-radius: 10px; margin-right: 10px; margin-left: 10px;">
+      <div style="display: flex; background-color: #231F20;border-radius: 10px; margin-right: 10px; margin-left: 10px;">
         <div style="padding: 5px; display: flex; padding-left: 20px;" class="mt-3">
           <i class="pi pi-money-bill" style="font-size: -webkit-xxx-large;color: #A47B2C;"></i>
         </div>
@@ -77,7 +73,8 @@
         <p-chart type="bar" [data]="dailyGraphSale" [options]="dailybasicOptions" height="500" width="500"></p-chart>
       </div>
       <div>
-        <p-chart type="bar" [data]="monthlyGraphSale" [options]="monthlybasicOptions" height="500" width="500"></p-chart>
+        <p-chart type="bar" [data]="monthlyGraphSale" [options]="monthlybasicOptions" height="500"
+          width="500"></p-chart>
       </div>
     </div>
 
@@ -88,55 +85,57 @@
             <div style="display: flex; background-color: #231F20;color: #A47B2C;">
               <div style="margin-left: 10px;margin-right: 10px; padding: 10px;">
                 <label class="">No of Products: <label for="" class="text-white">
-                  {{filteredProducts.length }}
-                </label></label>
-              </div> 
+                    {{ productLength }}
+                  </label></label>
+              </div>
               <div style="margin-left: auto;margin-right: 10px; padding: 10px;">
                 <label class="">Out Of stock Products</label>
               </div>
             </div>
           </ng-template>
           <ng-template let-products pTemplate="grid">
-            <div style="display:grid ;grid-template-columns: repeat(4, minmax(0, 1fr))">
-              <div class="col-12" *ngFor="let item of products; let first = first">
-                <div class="flex flex-column xl:flex-row xl:align-items-start p-4 gap-4"
-                  [ngClass]="{ 'border-top-1 surface-border': !first }">
-                  <img class="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round"
-                    [src]="'https://primefaces.org/cdn/primeng/images/demo/product/' + item.image" [alt]="item.name" />
-                  <div>
-                    <div style="display: flex;" class="mt-2">
-                      <div class="text-2xl font-bold text-900">{{ item.name }}</div>
-                      <div class="flex align-items-center gap-3" style="margin-left: 1rem;">
+            <div style="display:grid ;grid-template-columns: repeat(3, minmax(0, 1fr));">
+              <div class="col-12" *ngFor="let item of products; let first = first"
+                  style="border:1px solid #f3f2f1;">
+                  <div class="flex flex-column xl:flex-row xl:align-items-start p-4 gap-4"
+                      [ngClass]="{ 'border-top-1 surface-border': !first }">
+                      <img *ngIf="item.images" class=" shadow-2 block xl:block mx-auto border-round" style="width: 12rem !important; height: 10rem !important; justify-content: center !important;
+                      display: flex !important;" [src]="getBase64Image(item.images)"
+                          alt="{{ item.product.productname }} Image">
+                      <img *ngIf="!item.images" class=" shadow-2 block xl:block mx-auto border-round" style="width: 12rem !important; height: 10rem !important; justify-content: center !important;
+                      display: flex !important;" src="../../../../assets/imagenotfound.jpg">
+                      <div>
+                          <div style="display: flex;" class="mt-2">
+                              <div class="text-2xl font-bold text-900">{{ item.product.productname }}</div>
+                              <div class="flex align-items-center gap-3"
+                                  style="margin-left: auto !important;">
+                                  <div >
+                                      <p-tag [value]="'OUTOFSTOCK'" [severity]="'danger'"></p-tag>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="align-items-center sm:align-items-end gap-3 sm:gap-2"
+                              style="display: flex; margin-top: 5px !important;">
+                              <span class="text-2xl font-semibold">{{ item.product.price + 'Pkr' }}</span>
+                              <button pButton icon="pi pi-ellipsis-h"
+                                  class="md:align-self-end mb-2 p-button-rounded"
+                                  style="margin-left: auto !important;" (click)="tb.toggle($event)"></button>
+
+                              <p-overlayPanel #tb placement="bottom-end">
+                                  <a (click)="showViewDialog(item.product.ID, item.product.stock)"
+                                      class="dropdown-item edit-list" data-edit-id="8"><i
+                                          class="pi pi-th-large text-primary me-1"></i>
+                                      Update
+                                      Stock</a>
+                                  <a (click)="deleteDialog(item.product.ID)" class="dropdown-item remove-list"
+                                      data-remove-id="8"><i class="pi pi-trash text-danger me-1"></i>
+                                      Delete</a>
+                              </p-overlayPanel>
+                          </div>
                       </div>
-
-                      
-                    </div>
-                    <div class="align-items-center sm:align-items-end gap-3 sm:gap-2" style="display: flex;">
-                      <span class="text-2xl font-semibold">{{ '$' + item.price }}</span>
-                    </div>
-                    
-
-                    
-                    <div class="flex align-items-center gap-3" style="margin-left: auto;">
-                      <button pButton icon="pi pi-ellipsis-h" class="md:align-self-end mb-2 p-button-rounded"
-                        style="margin-left: auto; margin-right: 2rem;" (click)="tb.toggle($event)"></button>
-
-                      <p-overlayPanel #tb placement="bottom-end">
-                        <a (click)="showViewDialog(item.id)" class="dropdown-item edit-list"
-                          data-edit-id="8"><i class="pi pi-th-large text-primary me-1"></i>
-                          Update
-                          Stock</a>
-                        <a  class="dropdown-item remove-list" data-remove-id="8"><i
-                            class="pi pi-trash text-danger me-1"></i>
-                          Delete</a>
-                      </p-overlayPanel>
-
-                    </div>
-                    
                   </div>
-                </div>
               </div>
-            </div>
+          </div>
           </ng-template>
         </p-dataView>
       </div>
@@ -145,31 +144,32 @@
 </div>
 
 <p-dialog header="Update Stock of Product" [(visible)]="viewVisible" [modal]="true" [style]="{ width: '50vw' }"
-  [draggable]="false" [resizable]="false">
+    [draggable]="false" [resizable]="false">
 
-  <div class="modal-body">
-    <form>
-      <div class="row mb-3">
-        <div class="col-12">
-          <div class="mb-3">
-            <label class="control-label">Add Stock</label>
-            <input class="form-control" placeholder="Enter Quantity" type="text" name="title" autocomplete="off"
-              required />
-          </div>
+    <div class="modal-body">
+        <form>
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="mb-3">
+                        <label class="control-label">Update Stock</label>
+                        <input class="form-control" placeholder="Enter Quantity" type="number" name="title"
+                            [(ngModel)]="updateStock" autocomplete="off" required />
+                    </div>
 
-          <div>
-            <label>Current Stock Quantity : {{ StockVal }}.</label>
-          </div>
+                    <div>
+                        <label>Current Stock Quantity : {{ StockVal }}.</label>
+                    </div>
 
 
-        </div>
-      </div>
-      <div style="margin-left: auto; display: flex;">
-        <button type="button" class="btn btn-dark" style="margin-right: 10px;">Cancel</button>
-        <button type="submit" class="btn btn-primary" id="btn-save-event" (click)="saveProduct()">
-          Save
-        </button>
-      </div>
-    </form>
-  </div>
+                </div>
+            </div>
+            <div style="margin-left: auto; display: flex;">
+                <button type="button" class="btn btn-dark" style="margin-right: 10px;">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="btn-save-event"
+                    (click)="updateProductStock(StockValid)">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
 </p-dialog>

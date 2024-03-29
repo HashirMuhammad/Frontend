@@ -356,6 +356,103 @@ func DeleteProductHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Product with ID %d has been deleted successfully", productID)
 }
 
+func GetProductsByStockHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
+
+    // Extract JWT token from the request header
+    tokenString := r.Header.Get("Authorization")
+    if tokenString == "" {
+        http.Error(w, "Authorization token missing", http.StatusUnauthorized)
+        return
+    }
+
+    // Parse JWT token
+    token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+        return jwtKey, nil // Use your JWT signing key here
+    })
+    if err != nil {
+        http.Error(w, "Failed to parse token", http.StatusUnauthorized)
+        return
+    }
+
+    // Extract user ID from the JWT claims
+    claims, ok := token.Claims.(jwt.MapClaims)
+    if !ok || !token.Valid {
+        http.Error(w, "Invalid token", http.StatusUnauthorized)
+        return
+    }
+    userID := uint(claims["user_id"].(float64)) // Assuming user ID is stored as uint in the claims
+
+    // Retrieve the user from the database
+    user, err := GetUserByID(userID)
+    if err != nil {
+        http.Error(w, "Failed to retrieve user", http.StatusInternalServerError)
+        return
+    }
+    if user == nil {
+        http.Error(w, "User not found", http.StatusNotFound)
+        return
+    }
+
+    // Fetch products with zero stock associated with the authenticated user from the database
+    var products []Product
+    if err := Database.Where("user_id = ? AND stock = 0", userID).Find(&products).Error; err != nil {
+        http.Error(w, "Failed to fetch products with zero stock", http.StatusInternalServerError)
+        return
+    }
+
+    // Create a slice to store products with their images
+    var productsWithImages []map[string]interface{}
+
+    // Iterate over each product
+    for _, product := range products {
+        // Fetch all images associated with the current product
+        var images []Image
+        if err := Database.Where("product_id = ?", product.ID).Find(&images).Error; err != nil {
+            http.Error(w, "Failed to fetch images for product", http.StatusInternalServerError)
+            return
+        }
+
+        // Create a slice to store image data
+        var imageDatas [][]byte
+
+        // Read and store image data for each image
+        for _, image := range images {
+            // Read the image file from the server
+            file, err := os.Open(image.Name)
+            if err != nil {
+                http.Error(w, "Error reading image file", http.StatusInternalServerError)
+                return
+            }
+            defer file.Close()
+
+            // Read image data
+            imageData, err := ioutil.ReadAll(file)
+            if err != nil {
+                http.Error(w, "Error reading image data", http.StatusInternalServerError)
+                return
+            }
+
+            // Append image data to the slice
+            imageDatas = append(imageDatas, imageData)
+        }
+
+        // Construct response for the current product with its images
+        productWithImages := map[string]interface{}{
+            "product": product,
+            "images":  imageDatas,
+        }
+
+        // Append to the slice of products with images
+        productsWithImages = append(productsWithImages, productWithImages)
+    }
+
+    // Respond with the products along with their images
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(productsWithImages)
+}
+
+
 // Function to extract user ID from JWT token
 func userIDFromJWTToken(r *http.Request) uint {
 	// Extract JWT token from the request header

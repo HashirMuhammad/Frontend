@@ -45,27 +45,33 @@
                     <div class="col flex align-items-center justify-content-center">
                         <div class="grid-container">
                             <div *ngFor="let product of filteredProducts" class="card">
-                                <img src="../../../../assets/bamboo-watch.jpg" class="card-img-top" alt="Product Image">
+                                <img *ngIf="product.images" class=" shadow-2 block xl:block mx-auto border-round p-2"
+                                    style="width: 12rem !important; height: 10rem !important;"
+                                    [src]="getBase64Image(product.images)"
+                                    alt="{{ product.product.productname }} Image">
+                                <img *ngIf="!product.images" class=" shadow-2 block xl:block mx-auto border-round"
+                                    style="width: 12rem !important; height: 10rem !important;"
+                                    src="../../../../assets/imagenotfound.jpg">
                                 <div class="card-body">
-                                    <div style="display: flex;">
-                                        <h5 class="card-title">{{ product.name }}</h5>
-                                        <p class="card-text" style="margin-left: auto;">Price: ${{ product.price }}</p>
+                                    <div style="display: flex; border-top: 1px solid #f3f2f1;">
+                                        <h5 class="card-title">{{ product.product.productname }}</h5>
+                                        <p class="card-text" style="margin-left: auto;">Price: ${{ product.product.price }}</p>
                                     </div>
                                     <div style="display: flex;">
-                                        <p class="card-text" style="margin-left: auto;" *ngIf="product.quantity > 0">
-                                            Stock: {{ product.quantity }}</p>
-                                        <p class="card-text" style="margin-left: auto;" *ngIf="product.quantity == 0">
+                                        <p class="card-text" style="margin-left: auto;" *ngIf="product.product.stock > 0">
+                                            Stock: {{ product.product.stock }}</p>
+                                        <p class="card-text" style="margin-left: auto;" *ngIf="product.product.stock == 0">
                                             Stock:
                                             <p-tag [value]="OUTOFSTOCK" [severity]="'danger'"></p-tag>
                                         </p>
                                     </div>
 
-                                    <div class="quantity" *ngIf="product.quantity > 0">
-                                        <button type="button" class="btn btn-dark px-2.5" [disabled]="product.quantity === 0"
+                                    <div class="quantity" *ngIf="product.product.stock > 0">
+                                        <button type="button" class="btn btn-dark px-2.5" [disabled]="product.product.stock === 0"
                                             (click)="removeFromCart(product)">-</button>
                                         <!-- <span>{{ product.quantityInCart }}</span> -->
                                         <button type="button" class="btn btn-primary px-2.5" (click)="addToCart(product)"
-                                            [disabled]="product.quantityInCart >= product.quantity ">+</button>
+                                            [disabled]="cart.quantity >= product.product.stock ">+</button>
                                     </div>
                                 </div>
                             </div>
@@ -76,36 +82,51 @@
                     <div class="col flex align-items-center justify-content-center">
                         <div class="card" style="max-height: 35.3rem; overflow-y: auto;">
                             <div class="card-body">
-                                <h3>Cart Items</h3>
                                 <div class="cart-items-container">
-                                    <div *ngFor="let item of cart" class="cart-item"
-                                        (mouseenter)="showDeleteIcon(item.id)" (mouseleave)="hideDeleteIcon()">
-                                        <div class="row mb-2">
-                                            <div class="col-6">{{ item.name }}</div>
-                                            <div class="col-2">{{ item.price | currency }}</div>
-                                            <div class="col-2">
-                                                <!-- <button class="btn btn-dark btn-sm" [disabled]="item.quantity === 0"
-                                                (click)="decreaseQuantity(item)">-</button> -->
-                                                <span class=" px-2.5">{{ item.quantity }}</span>
-                                                <!-- <button class="btn btn-primary btn-sm"
-                                                    (click)="increaseQuantity(item)">+</button> -->
-                                            </div>
-                                            <div class="col-2">{{ getTotalItemPrice(item) | currency }}</div>
-                                            <div class="delete-icon-container" style="position: absolute;">
-                                                <button pButton type="button" icon="pi pi-trash" class="p-button-danger"
-                                                    *ngIf="item.id === hoveredItemId"
-                                                    (click)="removeFromCart(item)"></button>
-                                            </div>
-                                        </div>
+                                    <h3>Cart Items</h3>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Name</th>
+                                                    <th scope="col">Price</th>
+                                                    <th scope="col">Quantity</th>
+                                                    <th scope="col">Total Price</th>
+                                                    <th scope="col">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let item of cart" class="cart-item"
+                                                    (mouseenter)="showDeleteIcon(item.id)" (mouseleave)="hideDeleteIcon()">
+                                                    <td>{{ item.name }}</td>
+                                                    <td>{{ item.price | currency }}</td>
+                                                    <td>
+                                                        <!-- <button class="btn btn-dark btn-sm" [disabled]="item.quantity === 0"
+                                                        (click)="decreaseQuantity(item)">-</button> -->
+                                                        <span class="px-2.5">{{ item.quantity }}</span>
+                                                        <!-- <button class="btn btn-primary btn-sm"
+                                                            (click)="increaseQuantity(item)">+</button> -->
+                                                    </td>
+                                                    <td>{{ getTotalItemPrice(item) | currency }}</td>
+                                                    <td>
+                                                        <div class="delete-icon-container">
+                                                            <button pButton type="button" icon="pi pi-trash" class="p-button-danger"
+                                                                *ngIf="item.id === hoveredItemId" (click)="removeItemFromCart(item)"></button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
+                                
                                 <hr>
                                 <div class="row">
                                     <div class="col-8">Total Items: {{ getTotalItems() }}</div>
                                     <div class="col-4">Total Price: {{ getTotalPrice() | currency }}</div>
                                 </div>
                                 <div class="text-center mt-3">
-                                    <button class="btn btn-primary" (click)="showDialog()">Submit</button>
+                                    <button class="btn btn-primary" (click)="showDialog()" [disabled]="cart.length <= 0">Submit</button>
                                 </div>
                             </div>
                         </div>

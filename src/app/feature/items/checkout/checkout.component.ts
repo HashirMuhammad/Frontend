@@ -12,12 +12,18 @@ import { ItemsServiceService } from "../items-service.service";
 export class CheckoutComponent {
   products = [
     {
-      id: "",
-      code: "",
-      name: "",
-      image: "",
-      price: 1,
-      quantity: 1
+      images: "",
+      product: {
+        ID: 3,
+        CreatedAt: "",
+        UpdatedAt: "",
+        DeletedAt: null,
+        UserID: 2,
+        code: "",
+        productname: "",
+        price: "",
+        stock: ""
+      }
     }
   ];
   cart: any[] = [];
@@ -32,6 +38,7 @@ export class CheckoutComponent {
   paymentReceived = "";
   ClientName = "";
   formattedDate = "";
+  quantityinCart:any;
   clients = [
     {
       id: 1,
@@ -71,34 +78,62 @@ export class CheckoutComponent {
         debugger
         bill.items.forEach((item) => {
           this.products.push({
-            id: item.id,
-            code: item.code,
-            name: item.name,
-            image: item.image, // Set image as needed
-            price: item.price,
-            quantity: item.quantity
+            images: item.image, // Assuming item.image contains image URLs
+            product: {
+              ID: item.id,
+              CreatedAt: "", // Set appropriate values if available
+              UpdatedAt: "",
+              DeletedAt: null, // Assuming item is not deleted
+              UserID: 2, // Assuming UserID is obtained elsewhere
+              code: item.code,
+              productname: item.name, // Assuming item name corresponds to product name
+              price: item.price,
+              stock: item.quantity.toString() // Assuming item quantity corresponds to product stock
+            }
           });
-          this.alreadyaddToCart(this.products);
         });
       });
+      
       if (this.billproductsById.length > 0) {
         const bill = this.billproductsById[0];
         this.ClientName = bill.clientName;
         this.paymentReceived = bill.paymentReceived;
         this.formattedDate = bill.date;
       }
-      this.products = this.itemService.inventoryproducts;
+      // this.products = this.itemService.inventoryproducts;
+      this.getData();
 
     } else {
-      this.products = this.itemService.inventoryproducts;
+      // this.products = this.itemService.inventoryproducts;
+      this.getData();
     }
-    this.filteredProducts = this.products;
+    // this.filteredProducts = this.products;
+  }
+
+  getBase64Image(base64Image: string): string {
+    // Prefix the base64 data with the appropriate MIME type
+    return "data:image/png;base64," + base64Image;
+  }
+
+  getData(){
+    // Initialize filteredProducts with all products
+    this.itemService.getinventoryproducts().subscribe(
+      (data) => {
+        this.products = data;
+        console.log(data);
+        this.filteredProducts = this.products;
+      },
+      (error) => {
+        console.error("Error fetching clients:", error);
+      }
+    );
+    // this.items = this.products.length;
   }
 
   // Function to filter products based on search queries
   searchProductsByName() {
     this.filteredProducts = this.products.filter((product) => {
-      const nameMatch = product.name.toLowerCase().includes(this.nameSearchQuery.toLowerCase());
+      const nameMatch = product.product.productname.toLowerCase().includes(this.nameSearchQuery.toLowerCase());
       return nameMatch;
     });
   }
@@ -106,7 +141,7 @@ export class CheckoutComponent {
   // Function to filter products based on search queries
   searchProductsByCode() {
     this.filteredProducts = this.products.filter((product) => {
-      const barcodeMatch = product.code.toLowerCase().includes(this.barcodeSearchQuery.toLowerCase());
+      const barcodeMatch = product.product.code.toLowerCase().includes(this.barcodeSearchQuery.toLowerCase());
       return barcodeMatch;
     });
   }
@@ -114,7 +149,7 @@ export class CheckoutComponent {
   // Function to filter products based on search queries and checkbox state
   filterProducts() {
     this.filteredProducts = this.products.filter((product) => {
-      const isInStock = product.quantity > 0;
+      const isInStock = parseInt(product.product.stock) > 0;
 
       // Apply filtering based on search queries and checkbox state
       return !this.showInStockOnly || isInStock;
@@ -134,23 +169,29 @@ export class CheckoutComponent {
   }
 
   addToCart(product: any) {
-    const index = this.cart.findIndex((item) => item.id === product.id);
+    const index = this.cart.findIndex((item) => item.id === product.product.ID);
     if (index !== -1) {
-      if (this.cart[index].quantity < product.quantity) {
+      const availableStock = parseInt(product.product.stock);
+      const currentQuantity = parseInt(this.cart[index].quantity);
+      if (currentQuantity < availableStock) {
         this.cart[index].quantity++;
       } else {
-        this.messageService.add({ severity: "danger", summary: "Danger", detail: "insufficient stock" });
+        this.messageService.add({ severity: "danger", summary: "Danger", detail: "Insufficient stock" });
       }
     } else {
-      this.cart.push({ ...product, quantity: 1 });
+      // Add the necessary properties to the cart item
+      const { ID, code, productname, price, stock } = product.product;
+      this.cart.push({ id: ID, code, name: productname, price, stock, quantity: 1 });
     }
   }
+  
+  
 
   alreadyaddToCart(products: any[]) {
     products.forEach((product) => {
-      const index = this.cart.findIndex((item) => item.id === product.id);
+      const index = this.cart.findIndex((item) => item.id === product.product.ID);
       if (index !== -1) {
-        if (this.cart[index].quantity < product.quantity) {
+        if (this.cart[index].quantity < product.product.stock) {
           this.cart[index].quantity++;
         } else {
           this.messageService.add({ severity: "danger", summary: "Danger", detail: "Insufficient stock" });
@@ -162,7 +203,7 @@ export class CheckoutComponent {
   }
 
   removeFromCart(product: any) {
-    const index = this.cart.findIndex((item) => item.id === product.id);
+    const index = this.cart.findIndex((item) => item.id === product.product.ID);
     if (index !== -1) {
       if (this.cart[index].quantity > 0) {
         this.cart[index].quantity--;
@@ -172,6 +213,14 @@ export class CheckoutComponent {
       }
     }
   }
+
+  removeItemFromCart(item: any) {
+    const index = this.cart.findIndex((cartItem) => cartItem.id === item.id);
+    if (index !== -1) {
+        this.cart.splice(index, 1);
+    }
+}
+
 
   // increaseQuantity(item: any) {
   //   const index = this.products.findIndex((product) => product.id === item.id);

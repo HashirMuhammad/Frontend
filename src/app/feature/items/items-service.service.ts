@@ -173,7 +173,9 @@ export class ItemsServiceService {
     return this.http.get<any[]>("your-api-endpoint");
   }
 
- 
+  getProductStockZero(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/products/zero-stock`);
+  }
 
   updateProductStock(productId: string, newStock: string): Observable<any> {
     // Adjust the URL and request payload as per your backend API endpoint
