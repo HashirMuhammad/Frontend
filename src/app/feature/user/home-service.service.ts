@@ -6,20 +6,15 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class HomeServiceService {
-  dailySale = [540, 325, 702, 620, 400, 321, 951];
-  monthlySale = [540, 325, 702, 620, 654, 753, 987, 456, 321, 620, 450, 785];
+  private apiUrl = 'http://localhost:8080';
 
   constructor(private http: HttpClient) {}
 
-  getDailySales(): Observable<number[]> {
-    // Replace 'your_backend_api_url' with the actual URL of your backend API endpoint
-    const apiUrl = 'your_backend_api_url/dailySales';
-    return this.http.get<number[]>(apiUrl);
+  getDailySales(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/daily-sales`);
   }
 
-  getMonthlySales(): Observable<number[]> {
-    // Replace 'your_backend_api_url' with the actual URL of your backend API endpoint
-    const apiUrl = 'your_backend_api_url/monthlySales';
-    return this.http.get<number[]>(apiUrl);
+  getMonthlySales(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/monthly-sales`);
   }
 }

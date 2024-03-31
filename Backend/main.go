@@ -34,7 +34,9 @@ func main() {
 	r.HandleFunc("/cart/{cartDataID}", DeleteCartDataWithItemsHandler).Methods("DELETE")
 	r.HandleFunc("/get-all-clients", GetAllCartDataForUserHandler).Methods("GET")
 	r.HandleFunc("/get-remaining-payment-clients", GetRemainingPaymentOfClientsUnique).Methods("GET")
-	
+	r.HandleFunc("/daily-sales", GetCartData).Methods("GET")
+	r.HandleFunc("/monthly-sales", GetTotalPaymentReceivedByMonth).Methods("GET")
+
 	// Create a file server instance to serve files from the "static" directory
 	fs := http.FileServer(http.Dir("static"))
 

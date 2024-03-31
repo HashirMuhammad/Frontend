@@ -234,7 +234,7 @@ export class HomeComponent implements OnInit {
   monthlyGraphSale: any;
   dailybasicOptions: any;
   monthlybasicOptions: any;
-  dailySale: number[] = [];
+  dailySale: any;
   monthlySale: number[] = [];
   updateStock: any;
   StockValid: string;
@@ -243,22 +243,49 @@ export class HomeComponent implements OnInit {
   // fileSelected : File;
   // imageUrl: string | ArrayBuffer | null = null;
   // imageLoaded: boolean = false;
-  
-  constructor(
-    private homeService: HomeServiceService,
-    private itemsService: ItemsServiceService
-    // private http: HttpClient
-  ) {
+
+  constructor(private homeService: HomeServiceService, private itemsService: ItemsServiceService) // private http: HttpClient
+  {
     this.Calculatebil();
-    this.dailySale = this.homeService.dailySale;
-    this.monthlySale = this.homeService.monthlySale;
   }
 
   ngOnInit(): void {
     this.filterProducts();
     this.calculateTotals();
-    this.chartDaily();
-    this.chartmonthly();
+    this.weeklySale();
+    this.monthSale();
+  }
+
+  monthSale() {
+    this.homeService.getMonthlySales().subscribe(
+      (data) => {
+        console.log("Daily Sale successfully");
+        this.monthlySale = data;
+        this.chartmonthly();
+
+        // Optionally, perform any other action upon successful deletion
+      },
+      (error) => {
+        console.error("Error deleting product:", error);
+        // Handle error appropriately, e.g., display an error message to the user
+      }
+    );
+  }
+
+  weeklySale() {
+    this.homeService.getDailySales().subscribe(
+      (data) => {
+        console.log("Daily Sale successfully");
+        this.dailySale = data;
+        this.chartDaily();
+
+        // Optionally, perform any other action upon successful deletion
+      },
+      (error) => {
+        console.error("Error deleting product:", error);
+        // Handle error appropriately, e.g., display an error message to the user
+      }
+    );
   }
 
   // onUpload(event: UploadEvent) {
@@ -267,7 +294,7 @@ export class HomeComponent implements OnInit {
 
   // getImage(imageId: number) {
   //   const backendUrl = `http://localhost:8080/getImage?id=${imageId}`;
-  
+
   //   this.http.get(backendUrl, { responseType: 'blob' }).subscribe(
   //     (response: Blob) => {
   //       const reader = new FileReader();
@@ -308,7 +335,7 @@ export class HomeComponent implements OnInit {
 
     this.viewVisible = false;
   }
-  
+
   Calculatebil() {
     // Calculate totalSale, remainingPayment, and totalQuantity
     this.bills.forEach((bill) => {
@@ -463,7 +490,7 @@ export class HomeComponent implements OnInit {
     this.itemsService.getProductStockZero().subscribe(
       (data) => {
         this.filteredProducts = data;
-        this.productLength = this.filteredProducts.length
+        this.productLength = this.filteredProducts.length;
       },
       (error) => {
         console.error("Error fetching clients:", error);
