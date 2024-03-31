@@ -30,6 +30,27 @@
           </div>
         </ng-container>
 
+        <li class="list-group-item" (click)="addExpandClass('Payments')">
+          <a class="dropdown-toggle " style=" color: #A47B2C;"><i
+              class="pi pi-money-bill" style=" color: #A47B2C;"></i>&nbsp;
+            <span>&nbsp;Payments </span> <i class="pi pi-angle-down"></i></a>
+        </li>
+
+        <ng-container *ngIf="showMenu === 'Payments'">
+          <div style="background-color: #ebecf0d1;">
+            <li class="list-group" [routerLink]="['/payments/bill_payments']">
+              <a class="list-group-item dropdown-toggle " 
+              [routerLinkActive]="['router-link-active']"> <i class="pi pi-money-bill" style=" color: #A47B2C;"></i>&nbsp;
+                <span style=" color: #A47B2C;">&nbsp;Bill Payments</span></a>
+            </li>
+            <li class="list-group" [routerLink]="['/payments/client_payments']">
+              <a class="list-group-item dropdown-toggle " [routerLinkActive]="['router-link-active']">
+                <i class="pi pi-user-plus" style=" color: #A47B2C;"></i>&nbsp;
+                <span style=" color: #A47B2C;">&nbsp;Client Payments</span></a>
+            </li>
+          </div>
+        </ng-container>
+
         <li class="list-group-item" [routerLink]="['/items/bills']">
           <a  [routerLinkActive]="['router-link-active']" tooltip="Bills"
             container="body" class=" ">

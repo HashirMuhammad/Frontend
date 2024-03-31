@@ -72,6 +72,12 @@ export class InventoryComponent {
   activeIndex: number = 0;
   productId: any;
   url: any;
+  QrCode = [
+    {
+      productName: "",
+      code: ""
+  }
+  ]
 
   ngOnInit() {
     // Initialize filteredProducts with all products
@@ -318,4 +324,52 @@ export class InventoryComponent {
       }, 1000);
     });
   }
+
+  printQr() {
+    this.itemsService.getQrCode().subscribe(
+      (data: any[]) => {
+        console.log("QR codes successfully retrieved:", data);
+        // Prepare HTML content for all QR codes
+        const qrCodeHTML = data.map(product => this.generateQRCodeHTML(product)).join("");
+        // Open a new window with the HTML content
+        const popupWindow = window.open("", "_blank");
+        if (popupWindow) {
+          popupWindow.document.open();
+          // Write the QR code HTML content to the new window
+          popupWindow.document.write(qrCodeHTML);
+          popupWindow.document.close();
+          // Print the window
+          popupWindow.print();
+        } else {
+          console.error("Failed to open popup window.");
+        }
+      },
+      (error) => {
+        console.error("Error getting QR codes:", error);
+        // Handle error appropriately, e.g., display an error message to the user
+      }
+    );
+  }
+  
+  generateQRCodeHTML(product: any): string {
+    const combinedString = `${product.code}`;
+    let qrCodeHTML = `<div style="margin: 20px;display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">`;
+    // Generate QR code for the combined string
+    QRCode.toDataURL(combinedString, { errorCorrectionLevel: "M", width: 100 }, (err, url) => {
+      if (err) {
+        console.error("Error generating QR code:", err);
+        return;
+      }
+      // Add the QR code image and product name to the HTML content
+      qrCodeHTML += `<div>`;
+      qrCodeHTML += `<img src="${url}" alt="QR Code">`;
+      qrCodeHTML += `<h4 style="margin-left:20px">${product.productName}</h4>`;
+      qrCodeHTML += `</div>`;
+    });
+    qrCodeHTML += `</div>`;
+    return qrCodeHTML;
+  }
+  
+  
+  
 }

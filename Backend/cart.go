@@ -21,9 +21,10 @@ type CartData struct {
 	Items            []CartItem `json:"items"`
 	TotalQuantity    int        `json:"totalQuantity"`
 	TotalPrice       int        `json:"totalPrice"`
-	ClientID         int        `json:"clientId"`
+	ClientID         uint        
 	ClientName       string     `json:"clientName"`
 	Date             string     `json:"date"`
 	PaymentReceived  int        `json:"paymentReceived"`
 	RemainingPayment int        `json:"remainingPayment"`
 }
+

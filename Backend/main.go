@@ -23,6 +23,7 @@ func main() {
 	// r.HandleFunc("/getImage", getImage).Methods("GET")
 	r.HandleFunc("/create_product", CreateProductHandler).Methods("POST")
 	r.HandleFunc("/products", GetAllProductsHandler).Methods("GET")
+	r.HandleFunc("/productForTable", GetProductsForUserHandler).Methods("GET")
 	r.HandleFunc("/products/zero-stock", GetProductsByStockHandler).Methods("GET")
 	r.HandleFunc("/products/{product_id}/stock", UpdateStockHandler).Methods("PUT")
 	r.HandleFunc("/products/{productID}", UpdateProductHandler).Methods("PUT")
@@ -31,6 +32,8 @@ func main() {
 	r.HandleFunc("/get-cart", GetAllCartDataHandler).Methods("GET")
 	r.HandleFunc("/get-cart-items/{cartDataID}", GetCartDataWithItemsHandler).Methods("GET")
 	r.HandleFunc("/cart/{cartDataID}", DeleteCartDataWithItemsHandler).Methods("DELETE")
+	r.HandleFunc("/get-all-clients", GetAllCartDataForUserHandler).Methods("GET")
+	r.HandleFunc("/get-remaining-payment-clients", GetRemainingPaymentOfClientsUnique).Methods("GET")
 	
 	// Create a file server instance to serve files from the "static" directory
 	fs := http.FileServer(http.Dir("static"))

@@ -452,6 +452,53 @@ func GetProductsByStockHandler(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(productsWithImages)
 }
 
+// Define the handler function to fetch products for a specific user
+func GetProductsForUserHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Extract the user ID from the request header
+	userID := userIDFromJWTToken(r)
+	if userID == 0 {
+		http.Error(w, "User ID not provided in header", http.StatusBadRequest)
+		return
+	}
+
+	// Query the database to fetch products for the specified user ID
+	var products []Product
+	if err := Database.Where("user_id = ?", userID).Find(&products).Error; err != nil {
+		http.Error(w, "Failed to fetch products", http.StatusInternalServerError)
+		return
+	}
+
+	// Create a slice to hold the response payload for each product
+	var responseData []struct {
+		ProductName string `json:"productName"`
+		Code        string `json:"code"`
+	}
+
+	// Populate the response payload with required fields from each product
+	for _, product := range products {
+		response := struct {
+			ProductName string `json:"productName"`
+			Code        string `json:"code"`
+		}{
+			ProductName: product.ProductName,
+			Code:        product.Code,
+		}
+		responseData = append(responseData, response)
+	}
+
+	// Marshal the response data into JSON format
+	jsonData, err := json.Marshal(responseData)
+	if err != nil {
+		http.Error(w, "Failed to marshal JSON", http.StatusInternalServerError)
+		return
+	}
+
+	// Write the JSON response
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
 
 // Function to extract user ID from JWT token
 func userIDFromJWTToken(r *http.Request) uint {

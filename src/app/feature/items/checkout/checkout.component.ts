@@ -3,6 +3,32 @@ import { ActivatedRoute } from "@angular/router";
 import { MessageService } from "primeng/api";
 import { ItemsServiceService } from "../items-service.service";
 
+interface ViewUserData {
+  ID: number;
+  CreatedAt: string;
+  UpdatedAt: string;
+  DeletedAt: any;
+  UserID: number;
+  clientName: string;
+  date: string;
+  items: {
+    ID: number;
+    CartDataID: number;
+    CreatedAt: string;
+    UpdatedAt: string;
+    DeletedAt: any;
+    code: string;
+    id: number;
+    name: string;
+    price: string;
+    quantity: number;
+    totalItemPrice: number;
+  }[];
+  totalQuantity: number;
+  totalPrice: number;
+  paymentReceived: number;
+  remainingPayment: number;
+}
 @Component({
   selector: "app-checkout",
   templateUrl: "./checkout.component.html",
@@ -58,37 +84,48 @@ export class CheckoutComponent {
 
     if (this.id != null) {
       debugger;
-      this.billproductsById = this.itemService.billproductsById;
+      this.itemService.getbillproductsItems(this.id).subscribe(
+        (data: any) => {
+          // Parse received JSON data and assign it to viewproduct
+          this.billproductsById = data as ViewUserData;
+          this.cart = this.billproductsById;
+          console.log("billproductsById received:", this.billproductsById);
+        },
+        (error) => {
+          console.error("Error fetching:", error);
+        }
+      );
+      // this.billproductsById = this.itemService.billproductsById;
       // Clear the products array before populating it with new items
-      this.products = [];
+      // this.products = [];
 
       // Iterate over the items in billproductsById and push them into the products array
-      this.billproductsById.forEach((bill) => {
-        debugger;
-        bill.items.forEach((item) => {
-          this.products.push({
-            images: item.image, // Assuming item.image contains image URLs
-            product: {
-              ID: item.id,
-              CreatedAt: "", // Set appropriate values if available
-              UpdatedAt: "",
-              DeletedAt: null, // Assuming item is not deleted
-              UserID: 2, // Assuming UserID is obtained elsewhere
-              code: item.code,
-              productname: item.name, // Assuming item name corresponds to product name
-              price: item.price,
-              stock: item.quantity.toString() // Assuming item quantity corresponds to product stock
-            }
-          });
-        });
-      });
+      // this.billproductsById.forEach((bill) => {
+      //   debugger;
+      //   bill.items.forEach((item) => {
+      //     this.products.push({
+      //       images: item.image, 
+      //       product: {
+      //         ID: item.id,
+      //         CreatedAt: "", 
+      //         UpdatedAt: "",
+      //         DeletedAt: null,
+      //         UserID: 2,
+      //         code: item.code,
+      //         productname: item.name, 
+      //         price: item.price,
+      //         stock: item.quantity.toString() 
+      //       }
+      //     });
+      //   });
+      // });
 
-      if (this.billproductsById.length > 0) {
-        const bill = this.billproductsById[0];
-        this.ClientName = bill.clientName;
-        this.paymentReceived = bill.paymentReceived;
-        this.formattedDate = bill.date;
-      }
+      // if (this.billproductsById.length > 0) {
+      //   const bill = this.billproductsById[0];
+      //   this.ClientName = bill.clientName;
+      //   this.paymentReceived = bill.paymentReceived;
+      //   this.formattedDate = bill.date;
+      // }
       // this.products = this.itemService.inventoryproducts;
       this.getData();
     } else {
@@ -109,7 +146,7 @@ export class CheckoutComponent {
     this.itemService.getClientsByIdandName().subscribe(
       (data) => {
         this.clients = data;
-        console.log(data);
+        // console.log(data);
       },
       (error) => {
         console.error("Error fetching clients:", error);
@@ -122,7 +159,7 @@ export class CheckoutComponent {
     this.itemService.getinventoryproducts().subscribe(
       (data) => {
         this.products = data;
-        console.log(data);
+        // console.log(data);
         this.filteredProducts = this.products;
       },
       (error) => {
@@ -221,11 +258,27 @@ export class CheckoutComponent {
     }
   }
 
-  selectedClient(id: number, name: string) {
-    console.log(id, name);
-    this.ClientID = id;
-    this.ClientName = name;
-  }
+  selectedClient(clientId: any, clients: any[]) {
+    if (clientId === '0') {
+        // Handle the case where "Select" option is chosen
+        console.log("No client selected");
+        return;
+    }
+
+    // Find the selected client by ID
+    const selectedClient = clients.find(client => client.id === parseInt(clientId, 10));
+
+    if (selectedClient) {
+        // Extract the name of the selected client
+        const clientName = selectedClient.name;
+
+        // Now you have both the client ID and name
+        console.log("Selected client ID:", clientId);
+        console.log("Selected client name:", clientName);
+        this.ClientID = parseInt(clientId);
+    this.ClientName = clientName;
+    }
+}
 
   // increaseQuantity(item: any) {
   //   const index = this.products.findIndex((product) => product.id === item.id);
@@ -272,7 +325,7 @@ export class CheckoutComponent {
     const cartResponse = this.cart.map((item) => ({ id: item.id, code: item.code, totalQuantity: item.quantity }));
     const totalQuantity = this.getTotalItems();
     const totalPrice = this.getTotalPrice();
-    console.log({ cartResponse, totalQuantity, totalPrice });
+    // console.log({ cartResponse, totalQuantity, totalPrice });
 
     this.printCart();
   }
@@ -389,7 +442,7 @@ export class CheckoutComponent {
     // Call the service method to send the cart data to the backend
     this.itemService.saveCartData(cartData).subscribe(
       (response) => {
-        console.log("Cart data saved successfully:", response);
+        // console.log("Cart data saved successfully:", response);
         // Optionally, perform any other action upon successful save
         this.cart = [];
         this.visible = false;
@@ -401,7 +454,8 @@ export class CheckoutComponent {
       }
     );
     // For example, you can save it to local storage or send it to a server
-    console.log(jsonData); // Print JSON data to console for demonstration
+    // Print JSON data to console for demonstration
+    // console.log(jsonData); 
 
     // Example of saving to local storage
     // localStorage.setItem('cartData', jsonData);

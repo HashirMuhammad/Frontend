@@ -17,6 +17,11 @@ const routes: Routes = [
     // canActivate: [AuthGuard],
     loadChildren: () => import("./feature/clients/clients.module").then((module) => module.ClientsModule)
   },
+  {
+    path: "payments",
+    // canActivate: [AuthGuard],
+    loadChildren: () => import("./feature/payments/payments.module").then((module) => module.PaymentsModule)
+  },
 ];
 
 @NgModule({

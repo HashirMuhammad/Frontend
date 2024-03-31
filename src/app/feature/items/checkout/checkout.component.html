@@ -170,14 +170,15 @@
 
 
                     <div *ngIf="regularUser" class="mb-3" id="regularUserDropdown">
-                        <div *ngFor="let client of clients">
+                        <div>
                             <label class="control-label">Client Name</label>
-                            <select class="form-select" name="dropdown"
-                                (change)="selectedClient(client.id, client.name)">
-                                <option>Select</option>
-                                <option [value]="client.id">{{ client.name }}</option>
+                            <select class="form-select" name="dropdown" (change)="selectedClient($event.target.value, clients)">
+                                <option value="0">Select</option>
+                                <option *ngFor="let client of clients" [value]="client.id">{{ client.name }}</option>
                             </select>
                         </div>
+                        
+                        
                     </div>
 
 

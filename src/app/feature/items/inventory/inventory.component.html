@@ -21,7 +21,7 @@
 
 
             <div style="display: flex; margin-top: auto; margin-left: auto; margin-right: 20px;">
-                <h4>Total Items :</h4>&nbsp;&nbsp;<h4>{{items}}</h4>
+                <h4>Total Items :</h4>&nbsp;&nbsp;<h4>{{filteredProducts.length}}</h4>
             </div>
 
             <div style="margin-top: auto">
@@ -47,6 +47,12 @@
             <p-dataView #dv [value]="filteredProducts" [rows]="6" [paginator]="true" [layout]="layout">
                 <ng-template pTemplate="header">
                     <div style="display: flex; background-color: #231F20;">
+                        <div style="margin-right: 10px; padding: 10px;">
+                            <button pButton icon="pi pi-qrcode"
+                                                class="md:align-self-end mb-2 rounded"
+                                                style="margin-left: auto; margin-right: 2rem;"
+                                                (click)="printQr()">Print all Products QRcode</button>
+                        </div>
                         <div style="margin-left: auto;margin-right: 10px; padding: 10px;">
                             <p-dataViewLayoutOptions [layout]="layout"></p-dataViewLayoutOptions>
                         </div>
@@ -58,8 +64,10 @@
                             <div class="align-items-start p-4 gap-4" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
                                  border-bottom:1px solid #f3f2f1;"
                                 [ngClass]="{ 'border-top-1 surface-border': !first }">
-                                <img *ngIf="product.images" class=" shadow-2 block xl:block mx-auto border-round"
-                                    style="width: 12rem !important; height: 10rem !important;"
+                                <img *ngIf="product.images" class=" shadow block xl:block mx-auto border-round"
+                                    style="width: 12rem !important; height: 10rem !important; --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1) !important;
+                                    --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color) !important;
+                                    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;"
                                     [src]="getBase64Image(product.images)"
                                     alt="{{ product.product.productname }} Image">
                                 <img *ngIf="!product.images" class=" shadow-2 block xl:block mx-auto border-round"
@@ -106,7 +114,7 @@
                                             <div *ngIf="product.product.stock >= 10">
                                                 <p-tag [value]="INSTOCK" [severity]="'success'"></p-tag>
                                             </div>
-                                            <div *ngIf="product.product.stock >= 1 && product.product.stock <= 10">
+                                            <div *ngIf="product.product.stock >= 1 && product.product.stock < 10">
                                                 <p-tag [value]="LOWSTOCK" [severity]="'warning'"></p-tag>
                                             </div>
                                             <div>
@@ -303,7 +311,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="control-label">Barcode</label>
+                        <label class="control-label">Qrcode</label>
                         <input class="form-control" placeholder="Enter Barcode" type="text" name="title"
                             autocomplete="off" [(ngModel)]="productBarcode" required />
                     </div>

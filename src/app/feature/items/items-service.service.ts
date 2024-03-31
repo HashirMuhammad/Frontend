@@ -181,6 +181,10 @@ export class ItemsServiceService {
     return this.http.get<any[]>("your-api-endpoint");
   }
 
+  getQrCode(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/productForTable`);
+  }
+
   getProductStockZero(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/products/zero-stock`);
   }
