@@ -156,13 +156,21 @@ export class ItemsServiceService {
 
   constructor(private http: HttpClient) {}
 
+  getClientsByIdandName(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/clients-id-name`);
+  }
+
    // Define a method to add a product to the backend
    addProduct(product: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/create_product`, product);
   }
 
   getbillproducts(): Observable<any[]> {
-    return this.http.get<any[]>("your-api-endpoint");
+    return this.http.get<any[]>(`${this.apiUrl}/get-cart`);
+  }
+  
+  getbillproductsItems(id:any): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/get-cart-items/${id}`);
   }
 
   getinventoryproducts(): Observable<any[]> {
@@ -195,9 +203,14 @@ export class ItemsServiceService {
     return this.http.delete(apiUrl);
   }
 
+  removebill(id: number): Observable<any> {
+    const apiUrl = `${this.apiUrl}/cart/${id}`;
+    return this.http.delete(apiUrl);
+  }
+
   saveCartData(cartData: any): Observable<any> {
     // Replace 'your_backend_api_url' with the actual URL of your backend API endpoint
-    const apiUrl = 'your_backend_api_url/saveCart';
+    const apiUrl = `${this.apiUrl}/save-cart`;
     return this.http.post(apiUrl, cartData);
   }
 }

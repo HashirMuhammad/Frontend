@@ -207,3 +207,40 @@ func DeleteClientHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Client deleted successfully"})
 }
+
+// GetClientsHandler returns the ID and name of clients for the user whose ID is in the JWT token.
+func GetClientsNameIDHandler(w http.ResponseWriter, r *http.Request) {
+    // Set the Content-Type header of the response to application/json
+    w.Header().Set("Content-Type", "application/json")
+
+    // Get user ID from JWT token
+    userID := userIDFromJWTToken(r)
+
+    // Query the database to fetch client IDs and names associated with the user
+    var clients []Client
+    if err := Database.Where("user_id = ?", userID).Find(&clients).Error; err != nil {
+        http.Error(w, "Failed to fetch clients", http.StatusInternalServerError)
+        return
+    }
+
+    // Create a slice to store client data (ID and name)
+    var clientDataList []ClientData
+    for _, client := range clients {
+        clientData := ClientData{
+            ID:   client.ID,
+            Name: client.Name,
+        }
+        clientDataList = append(clientDataList, clientData)
+    }
+
+    // Marshal the client data slice into JSON format
+    jsonData, err := json.Marshal(clientDataList)
+    if err != nil {
+        http.Error(w, "Failed to marshal JSON", http.StatusInternalServerError)
+        return
+    }
+
+    // Write the JSON response
+    w.WriteHeader(http.StatusOK)
+    w.Write(jsonData)
+}

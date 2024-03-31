@@ -19,10 +19,12 @@
             <div style="margin-left: 16px">
                 <label for="example-text-input" class="col-md-8 col-form-label">Search By Qrcode</label>
                 <div class="col-md-12" style="position: relative;">
-                    <input class="form-control" type="text" [(ngModel)]="barcodeSearchQuery" (input)="searchProductsByCode()" placeholder="Search by Qrcode">
-                    <i class="pi pi-qrcode" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);"></i>
+                    <input class="form-control" type="text" [(ngModel)]="barcodeSearchQuery"
+                        (input)="searchProductsByCode()" placeholder="Search by Qrcode">
+                    <i class="pi pi-qrcode"
+                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);"></i>
                 </div>
-                
+
             </div>
 
             <div style="margin-left: 16px">
@@ -55,22 +57,27 @@
                                 <div class="card-body">
                                     <div style="display: flex; border-top: 1px solid #f3f2f1;">
                                         <h5 class="card-title">{{ product.product.productname }}</h5>
-                                        <p class="card-text" style="margin-left: auto;">Price: ${{ product.product.price }}</p>
+                                        <p class="card-text" style="margin-left: auto;">Price: ${{ product.product.price
+                                            }}</p>
                                     </div>
                                     <div style="display: flex;">
-                                        <p class="card-text" style="margin-left: auto;" *ngIf="product.product.stock > 0">
+                                        <p class="card-text" style="margin-left: auto;"
+                                            *ngIf="product.product.stock > 0">
                                             Stock: {{ product.product.stock }}</p>
-                                        <p class="card-text" style="margin-left: auto;" *ngIf="product.product.stock == 0">
+                                        <p class="card-text" style="margin-left: auto;"
+                                            *ngIf="product.product.stock == 0">
                                             Stock:
                                             <p-tag [value]="OUTOFSTOCK" [severity]="'danger'"></p-tag>
                                         </p>
                                     </div>
 
                                     <div class="quantity" *ngIf="product.product.stock > 0">
-                                        <button type="button" class="btn btn-dark px-2.5" [disabled]="product.product.stock === 0"
+                                        <button type="button" class="btn btn-dark px-2.5"
+                                            [disabled]="product.product.stock === 0"
                                             (click)="removeFromCart(product)">-</button>
                                         <!-- <span>{{ product.quantityInCart }}</span> -->
-                                        <button type="button" class="btn btn-primary px-2.5" (click)="addToCart(product)"
+                                        <button type="button" class="btn btn-primary px-2.5"
+                                            (click)="addToCart(product)"
                                             [disabled]="cart.quantity >= product.product.stock ">+</button>
                                     </div>
                                 </div>
@@ -97,9 +104,10 @@
                                             </thead>
                                             <tbody>
                                                 <tr *ngFor="let item of cart" class="cart-item"
-                                                    (mouseenter)="showDeleteIcon(item.id)" (mouseleave)="hideDeleteIcon()">
+                                                    (mouseenter)="showDeleteIcon(item.id)"
+                                                    (mouseleave)="hideDeleteIcon()">
                                                     <td>{{ item.name }}</td>
-                                                    <td>{{ item.price | currency }}</td>
+                                                    <td>{{ item.price }} Pkr</td>
                                                     <td>
                                                         <!-- <button class="btn btn-dark btn-sm" [disabled]="item.quantity === 0"
                                                         (click)="decreaseQuantity(item)">-</button> -->
@@ -107,11 +115,13 @@
                                                         <!-- <button class="btn btn-primary btn-sm"
                                                             (click)="increaseQuantity(item)">+</button> -->
                                                     </td>
-                                                    <td>{{ getTotalItemPrice(item) | currency }}</td>
+                                                    <td>{{ getTotalItemPrice(item) }} Pkr</td>
                                                     <td>
                                                         <div class="delete-icon-container">
-                                                            <button pButton type="button" icon="pi pi-trash" class="p-button-danger"
-                                                                *ngIf="item.id === hoveredItemId" (click)="removeItemFromCart(item)"></button>
+                                                            <button pButton type="button" icon="pi pi-trash"
+                                                                class="p-button-danger"
+                                                                *ngIf="item.id === hoveredItemId"
+                                                                (click)="removeItemFromCart(item)"></button>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -119,14 +129,15 @@
                                         </table>
                                     </div>
                                 </div>
-                                
+
                                 <hr>
                                 <div class="row">
                                     <div class="col-8">Total Items: {{ getTotalItems() }}</div>
-                                    <div class="col-4">Total Price: {{ getTotalPrice() | currency }}</div>
+                                    <div class="col-4">Total Price: {{ getTotalPrice() }} Pkr</div>
                                 </div>
                                 <div class="text-center mt-3">
-                                    <button class="btn btn-primary" (click)="showDialog()" [disabled]="cart.length <= 0">Submit</button>
+                                    <button class="btn btn-primary" (click)="showDialog()"
+                                        [disabled]="cart.length <= 0">Submit</button>
                                 </div>
                             </div>
                         </div>
@@ -138,7 +149,7 @@
     </div>
 </div>
 
-<p-dialog header="Add New Product" [(visible)]="visible" [modal]="true" [style]="{ width: '50vw' }" [draggable]="false"
+<p-dialog header="Cart Details" [(visible)]="visible" [modal]="true" [style]="{ width: '50vw' }" [draggable]="false"
     [resizable]="false">
 
     <div class="modal-body">
@@ -159,12 +170,16 @@
 
 
                     <div *ngIf="regularUser" class="mb-3" id="regularUserDropdown">
-                        <label class="control-label">Client Name</label>
-                        <select class="form-select" name="dropdown" [(ngModel)]="ClientName">
-                            <option>Select</option>
-                            <option *ngFor="let client of clients" [value]="client.id">{{ client.name }}</option>
-                        </select>
+                        <div *ngFor="let client of clients">
+                            <label class="control-label">Client Name</label>
+                            <select class="form-select" name="dropdown"
+                                (change)="selectedClient(client.id, client.name)">
+                                <option>Select</option>
+                                <option [value]="client.id">{{ client.name }}</option>
+                            </select>
+                        </div>
                     </div>
+
 
                     <div class="mb-3">
                         <label class="control-label">Payment Received</label>

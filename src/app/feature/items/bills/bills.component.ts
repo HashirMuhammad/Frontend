@@ -2,23 +2,33 @@ import { Component } from "@angular/core";
 import { Router } from "@angular/router";
 import { ItemsServiceService } from "../items-service.service";
 
-interface ProductInterface {
-  id: number;
+interface ViewUserData {
+  ID: number;
+  CreatedAt: string;
+  UpdatedAt: string;
+  DeletedAt: any;
+  UserID: number;
+  clientName: string;
+  date: string;
   items: {
+    ID: number;
+    CartDataID: number;
+    CreatedAt: string;
+    UpdatedAt: string;
+    DeletedAt: any;
+    code: string;
     id: number;
     name: string;
-    price: number;
+    price: string;
     quantity: number;
-    code: string;
     totalItemPrice: number;
   }[];
   totalQuantity: number;
   totalPrice: number;
-  clientName: string;
-  date: string;
   paymentReceived: number;
   remainingPayment: number;
 }
+
 @Component({
   selector: "app-bills",
   templateUrl: "./bills.component.html",
@@ -28,50 +38,147 @@ export class BillsComponent {
   billproducts = [
     {
       id: 1,
-      items:[
-      {
-        id:1,
-        name:"",
-        price:65,
-        quantity:1,
-        code:"",
-        totalItemPrice:65
-      }
-    ],
-    totalQuantity:1,
-    totalPrice:65,
-    clientName:"",
-    date:"",
-    paymentReceived:0,
-    remainingPayment:1
-  },
+      items: [
+        {
+          id: 1,
+          name: "",
+          price: 65,
+          quantity: 1,
+          code: "",
+          totalItemPrice: 65
+        }
+      ],
+      totalQuantity: 1,
+      totalPrice: 65,
+      clientName: "",
+      date: "",
+      paymentReceived: 0,
+      remainingPayment: 1
+    }
   ];
   selectedProduct: boolean;
-  viewproduct :ProductInterface[] = []
+  productToPrint = {
+    ID: 0,
+    CreatedAt: "",
+    UpdatedAt: "",
+    DeletedAt: null,
+    UserID: 2,
+    clientName: "",
+    date: "",
+    items: [
+      {
+        ID: 9,
+        CartDataID: 0,
+        CreatedAt: "",
+        UpdatedAt: "",
+        DeletedAt: null,
+        code: "0",
+        id: 2,
+        name: "",
+        price: "0",
+        quantity: 4,
+        totalItemPrice: 0
+      }
+    ],
+    totalQuantity: 0,
+    totalPrice: 0,
+    paymentReceived: 0,
+    remainingPayment: 0
+  };
+  viewproduct = {
+    ID: 0,
+    CreatedAt: "",
+    UpdatedAt: "",
+    DeletedAt: null,
+    UserID: 2,
+    clientName: "",
+    date: "",
+    items: [
+      {
+        ID: 9,
+        CartDataID: 0,
+        CreatedAt: "",
+        UpdatedAt: "",
+        DeletedAt: null,
+        code: "0",
+        id: 2,
+        name: "",
+        price: "0",
+        quantity: 4,
+        totalItemPrice: 0
+      }
+    ],
+    totalQuantity: 0,
+    totalPrice: 0,
+    paymentReceived: 0,
+    remainingPayment: 0
+  };
 
-  constructor(
-    private router: Router,
-    private itemsService: ItemsServiceService
-  ) {}
+  constructor(private router: Router, private itemsService: ItemsServiceService) {}
 
   ngOnInit() {
-    this.billproducts = this.itemsService.billproducts;
+    this.itemsService.getbillproducts().subscribe(
+      (data) => {
+        this.billproducts = data;
+        console.log(data);
+      },
+      (error) => {
+        console.error("Error fetching clients:", error);
+      }
+    );
   }
 
   getProductById(id: number) {
-    return this.billproducts.find(product => product.id === id);
+    return this.billproducts.find((product) => product.id === id);
   }
 
-  ViewtUser(id: any){
+  ViewtUser(id: any) {
     console.log(id);
-
-    this.viewproduct = [this.getProductById(id)];
+    this.itemsService.getbillproductsItems(id).subscribe(
+      (data: any) => {
+        // Parse received JSON data and assign it to viewproduct
+        this.viewproduct = data as ViewUserData;
+        console.log("ViewUserData received:", this.viewproduct);
+      },
+      (error) => {
+        console.error("Error fetching:", error);
+      }
+    );
     console.log(this.viewproduct);
-    this.selectedProduct = true
+    this.selectedProduct = true;
   }
 
   print(id: number) {
-    const productToPrint = this.getProductById(id);
+    this.itemsService.getbillproductsItems(id).subscribe(
+      (data: any[]) => {
+        debugger;
+        if (data && data.length > 0) {
+          // Access the first element of the array
+          const productData = data[0];
+          // Parse received JSON data and assign it to productToPrint
+          this.productToPrint = productData as ViewUserData;
+          console.log("ViewUserData received:", this.productToPrint);
+
+          // Check if productToPrint and its items are defined
+          if (this.productToPrint && this.productToPrint.items) {
+            setTimeout(() => {
+              this.printContent();
+            }, 100); // Delay execution for 100 milliseconds
+          } else {
+            console.error("Product data or items are undefined");
+          }
+        } else {
+          console.error("No data received");
+        }
+      },
+      (error) => {
+        console.error("Error fetching:", error);
+      }
+    );
+  }
+
+  printContent() {
+    // const productToPrint = this.getProductById(id);
     const printContent = `
       <style>
         /* CSS styles for the printed table */
@@ -101,13 +208,13 @@ export class BillsComponent {
         }
       </style>
       <h1>Product Details</h1>
-      <p>ID: ${productToPrint.id}</p>
-      <p>Client Name: ${productToPrint.clientName}</p>
-      <p>Date: ${productToPrint.date}</p>
-      <p>Total Quantity: ${productToPrint.totalQuantity}</p>
-      <p>Total Price: ${productToPrint.totalPrice}</p>
-      <p>Payment Received: ${productToPrint.paymentReceived}</p>
-      <p>Remaining Payment: ${productToPrint.remainingPayment}</p>
+      <p>ID: ${this.productToPrint.ID}</p>
+      <p>Client Name: ${this.productToPrint.clientName}</p>
+      <p>Date: ${this.productToPrint.date}</p>
+      <p>Total Quantity: ${this.productToPrint.totalQuantity}</p>
+      <p>Total Price: ${this.productToPrint.totalPrice}</p>
+      <p>Payment Received: ${this.productToPrint.paymentReceived}</p>
+      <p>Remaining Payment: ${this.productToPrint.remainingPayment}</p>
       <h2>Items</h2>
       <table class="print-table">
         <thead>
@@ -120,7 +227,9 @@ export class BillsComponent {
           </tr>
         </thead>
         <tbody>
-          ${productToPrint.items.map(item => `
+          ${this.productToPrint.items
+            .map(
+              (item) => `
             <tr>
               <td>${item.id}</td>
               <td>${item.name}</td>
@@ -128,20 +237,22 @@ export class BillsComponent {
               <td>${item.quantity}</td>
               <td>${item.code}</td>
             </tr>
-          `).join('')}
+          `
+            )
+            .join("")}
         </tbody>
       </table>
     `;
-    
-    const popupWindow = window.open('', '_blank');
+
+    const popupWindow = window.open("", "_blank");
     popupWindow.document.open();
     popupWindow.document.write(printContent);
     popupWindow.document.close();
     popupWindow.print();
   }
-  
-  edit(id: any){
-    this.router.navigate([`items/checkout/${id}`])
+
+  edit(id: any) {
+    this.router.navigate([`items/checkout/${id}`]);
   }
 
   getData() {
@@ -150,7 +261,22 @@ export class BillsComponent {
         this.billproducts = data;
       },
       (error) => {
-        console.error("Error fetching clients:", error);
+        console.error("Error fetching :", error);
+      }
+    );
+  }
+
+  removeUser(id: any) {
+    console.log(id);
+    this.itemsService.removebill(id).subscribe(
+      () => {
+        console.log(`ID ${id} removed successfully.`);
+        this.getData();
+        // Optionally, perform any additional action upon successful removal
+      },
+      (error) => {
+        console.error(`Error removing user with ID ${id}:`, error);
+        // Handle error appropriately, e.g., display an error message to the user
       }
     );
   }

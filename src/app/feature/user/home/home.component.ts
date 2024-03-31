@@ -483,5 +483,18 @@ export class HomeComponent implements OnInit {
     this.viewVisible = false;
   }
 
-  
+  deleteDialog(id: any) {
+    // Call the ProductService to delete the product
+    this.itemsService.deleteProduct(id).subscribe(
+      () => {
+        console.log("Product deleted successfully");
+        this.filterProducts();
+        // Optionally, perform any other action upon successful deletion
+      },
+      (error) => {
+        console.error("Error deleting product:", error);
+        // Handle error appropriately, e.g., display an error message to the user
+      }
+    );
+  }
 }

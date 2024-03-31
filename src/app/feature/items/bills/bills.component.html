@@ -7,11 +7,12 @@
 
 
         <div style="padding: 2rem">
-            <p-table #dt2 dataKey="id" [value]="billproducts" styleClass="p-datatable-striped" rows="10" [paginator]="true"
-                [showCurrentPageReport]="true"
+
+            <p-table #dt2 dataKey="ID" [value]="billproducts" styleClass="p-datatable-striped" rows="10"
+                [paginator]="true" [showCurrentPageReport]="true"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                 [rowsPerPageOptions]="[5, 10, 20]"
-                [globalFilterFields]="['id', 'totalQuantity', 'clientName', 'date','totalPrice', 'paymentReceived', 'remainingPayment']">
+                [globalFilterFields]="['ID', 'totalQuantity', 'clientName', 'date','totalPrice', 'paymentReceived', 'remainingPayment']">
                 <ng-template pTemplate="caption">
                     <div class="flex">
                         <span class="p-input-icon-left ml-auto">
@@ -23,11 +24,11 @@
                 </ng-template>
                 <ng-template pTemplate="header">
                     <tr>
-                        <th pSortableColumn="id" style="background-color: #231F20; color: #A47B2C; border-top-left-radius: 10px;
+                        <th pSortableColumn="ID" style="background-color: #231F20; color: #A47B2C; border-top-left-radius: 10px;
                     border-bottom-left-radius: 10px;">
-                            Id <p-sortIcon field="id"></p-sortIcon></th>
+                            Id <p-sortIcon field="ID"></p-sortIcon></th>
                         <th pSortableColumn="clientName" style="background-color: #231F20; color: #A47B2C;">
-                            client Name <p-sortIcon field="clientName"></p-sortIcon></th>
+                            Client Name <p-sortIcon field="clientName"></p-sortIcon></th>
                         <th pSortableColumn="totalQuantity" style="background-color: #231F20; color: #A47B2C;">
                             Total Quantity <p-sortIcon field="totalQuantity"></p-sortIcon></th>
                         <th pSortableColumn="date" style="background-color: #231F20; color: #A47B2C;">
@@ -43,31 +44,32 @@
                     </tr>
                     <tr>
                         <th>
-                            <p-columnFilter type="text" field="id"></p-columnFilter>
+                            <p-columnFilter type="text" field="ID" placeholder="Id"></p-columnFilter>
                         </th>
                         <th>
-                            <p-columnFilter type="text" field="clientName"></p-columnFilter>
+                            <p-columnFilter type="text" field="clientName" placeholder="Name"></p-columnFilter>
                         </th>
                         <th>
-                            <p-columnFilter type="text" field="totalQuantity"></p-columnFilter>
+                            <p-columnFilter type="text" field="totalQuantity" placeholder="Qty"></p-columnFilter>
                         </th>
                         <th>
-                            <p-columnFilter type="date" field="date"></p-columnFilter>
+                            <p-columnFilter type="date" field="date" placeholder="Date"></p-columnFilter>
                         </th>
                         <th>
-                            <p-columnFilter type="text" field="totalPrice"></p-columnFilter>
+                            <p-columnFilter type="text" field="totalPrice" placeholder="Total"></p-columnFilter>
                         </th>
                         <th>
-                            <p-columnFilter type="text" field="paymentReceived"></p-columnFilter>
+                            <p-columnFilter type="text" field="paymentReceived" placeholder="Received"></p-columnFilter>
                         </th>
                         <th>
-                            <p-columnFilter type="text" field="remainingPayment"></p-columnFilter>
+                            <p-columnFilter type="text" field="remainingPayment"
+                                placeholder="Remaining"></p-columnFilter>
                         </th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-product>
                     <tr>
-                        <td>{{product.id}}</td>
+                        <td>{{product.ID}}</td>
                         <td>{{product.clientName}}</td>
                         <td>{{product.totalQuantity}}</td>
                         <td>{{product.date}}</td>
@@ -81,17 +83,16 @@
                                         <a class="dropdown-toggle card-drop px-2 show" (click)="tb.toggle($event)"
                                             aria-expanded="true">
                                             <i class="pi pi-ellipsis-h"></i> </a>
-                                        <p-overlayPanel #tb placement="bottom-end">
-                                            <a (click)="ViewtUser(product.id)"
-                                                class="dropdown-item edit-list" data-edit-id="8"><i
-                                                    class="pi pi-search text-dark me-1"></i> View</a>
-                                            <a href="javascript:void(0);" (click)="edit(product.id)"
+                                        <p-overlayPanel #tb>
+                                            <a (click)="ViewtUser(product.ID)" class="dropdown-item edit-list"
+                                                data-edit-id="8"><i class="pi pi-search text-dark me-1"></i> View</a>
+                                            <a href="javascript:void(0);" (click)="edit(product.ID)"
                                                 class="dropdown-item edit-list" data-edit-id="8"><i
                                                     class="pi pi-pencil text-success me-1"></i> Edit</a>
-                                            <a href="javascript:void(0);" (click)="print(product.id)"
+                                            <a href="javascript:void(0);" (click)="print(product.ID)"
                                                 class="dropdown-item edit-list" data-edit-id="8"><i
                                                     class="pi pi-print text-primary me-1"></i> Print</a>
-                                            <a href="javascript:void(0);" (click)="removeUser(product.id)"
+                                            <a href="javascript:void(0);" (click)="removeUser(product.ID)"
                                                 class="dropdown-item remove-list" data-remove-id="8"><i
                                                     class="pi pi-trash text-danger me-1"></i> Delete</a>
                                         </p-overlayPanel>
@@ -114,34 +115,34 @@
 <p-dialog header="Product Details" [(visible)]="selectedProduct" [modal]="true" [responsive]="true">
     <ng-template pTemplate="content">
         <div class="product-details" *ngFor="let val of viewproduct">
-          <p>ID: {{ val.id }}</p>
-          <p>Client Name: {{ val.clientName }}</p>
-          <p>Date: {{ val.date }}</p>
-          <p>Total Quantity: {{ val.totalQuantity }}</p>
-          <p>Total Price: {{ val.totalPrice }}</p>
-          <p>Payment Received: {{ val.paymentReceived }}</p>
-          <p>Remaining Payment: {{ val.remainingPayment }}</p>
-      
-          <table class="item-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Code</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of val.items">
-                <td>{{ item.id }}</td>
-                <td>{{ item.name }}</td>
-                <td>{{ item.price }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.code }}</td>
-              </tr>
-            </tbody>
-          </table>
+            <p>ID: {{ val.ID }}</p>
+            <p>Client Name: {{ val.clientName }}</p>
+            <p>Date: {{ val.date }}</p>
+            <p>Total Quantity: {{ val.totalQuantity }}</p>
+            <p>Total Price: {{ val.totalPrice }}</p>
+            <p>Payment Received: {{ val.paymentReceived }}</p>
+            <p>Remaining Payment: {{ val.remainingPayment }}</p>
+
+            <table class="item-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of val.items">
+                        <td>{{ item.ID }}</td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.price }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.code }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-      </ng-template>      
-  </p-dialog>
+    </ng-template>
+</p-dialog>

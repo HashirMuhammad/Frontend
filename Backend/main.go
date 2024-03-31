@@ -15,20 +15,23 @@ func main() {
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/save-client", CreateClientHandler).Methods("POST")
 	r.HandleFunc("/clients", GetClientsHandler).Methods("GET")
+	r.HandleFunc("/clients-id-name", GetClientsNameIDHandler).Methods("GET")
 	r.HandleFunc("/clients/{id}", GetClientByIDHandler).Methods("GET")
 	r.HandleFunc("/clients/{id}", UpdateClientHandler).Methods("PUT")
 	r.HandleFunc("/clients/{id}", DeleteClientHandler).Methods("DELETE")
-
 	r.HandleFunc("/upload/{productId}", uploadFile).Methods("POST")
 	// r.HandleFunc("/getImage", getImage).Methods("GET")
-
 	r.HandleFunc("/create_product", CreateProductHandler).Methods("POST")
 	r.HandleFunc("/products", GetAllProductsHandler).Methods("GET")
 	r.HandleFunc("/products/zero-stock", GetProductsByStockHandler).Methods("GET")
 	r.HandleFunc("/products/{product_id}/stock", UpdateStockHandler).Methods("PUT")
 	r.HandleFunc("/products/{productID}", UpdateProductHandler).Methods("PUT")
 	r.HandleFunc("/products/{product_id}", DeleteProductHandler).Methods("DELETE")
-
+	r.HandleFunc("/save-cart", SaveCartDataHandler).Methods("POST")
+	r.HandleFunc("/get-cart", GetAllCartDataHandler).Methods("GET")
+	r.HandleFunc("/get-cart-items/{cartDataID}", GetCartDataWithItemsHandler).Methods("GET")
+	r.HandleFunc("/cart/{cartDataID}", DeleteCartDataWithItemsHandler).Methods("DELETE")
+	
 	// Create a file server instance to serve files from the "static" directory
 	fs := http.FileServer(http.Dir("static"))
 

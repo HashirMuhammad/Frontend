@@ -26,6 +26,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ChartModule } from 'primeng/chart';
 import { QRCodeModule } from 'angularx-qrcode';
 import { InputMaskModule } from 'primeng/inputmask';
+import { TreeTableModule } from 'primeng/treetable';
 
 @NgModule({
   declarations: [],
@@ -56,7 +57,8 @@ import { InputMaskModule } from 'primeng/inputmask';
     InputTextareaModule,
     ChartModule,
     QRCodeModule,
-    InputMaskModule
+    InputMaskModule,
+    TreeTableModule
   ],
   exports: [
     CommonModule,
@@ -85,7 +87,8 @@ import { InputMaskModule } from 'primeng/inputmask';
     InputTextareaModule,
     ChartModule,
     QRCodeModule,
-    InputMaskModule
+    InputMaskModule,
+    TreeTableModule
   ],
 })
 export class SharedModule {
