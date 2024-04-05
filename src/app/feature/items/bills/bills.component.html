@@ -75,7 +75,12 @@
                         <td>{{product.date}}</td>
                         <td>{{product.totalPrice}}</td>
                         <td>{{product.paymentReceived}}</td>
-                        <td>{{product.remainingPayment}}</td>
+                        <td>
+                            <div [ngClass]="{'outofstock': product.remainingPayment <= 0, 
+                            'instock': product.remainingPayment > 0}">
+                                {{product.remainingPayment}}
+                            </div>
+                        </td>
                         <td>
                             <ul class="list-inline font-size-20 contact-links mb-0">
                                 <li class="list-inline-item">

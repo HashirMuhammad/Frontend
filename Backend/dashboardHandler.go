@@ -35,8 +35,11 @@ func GetCartData(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonData)
 }
+
 // Function to fetch total remaining payments for the current week
 func getCurrentWeekTotalRecievedPayments(userID int) ([]int, error) {
+
+	// days.day_name AS day,
 	// Execute the SQL query for the current week
 	rows, err := Database.Raw(`
 	SELECT 
@@ -54,19 +57,24 @@ FROM
 LEFT JOIN 
     (
         SELECT 
-            STR_TO_DATE(date, '%d/%m/%Y') AS date_formatted,
+            STR_TO_DATE(created_at, '%Y-%m-%d') AS date_formatted,
             payment_received
         FROM 
-            posterminal.cart_data
+            posterminal.cart_data d
         WHERE 
-            STR_TO_DATE(date, '%d/%m/%Y') BETWEEN DATE_SUB(CURDATE(), INTERVAL 6 DAY) AND CURDATE()
+            CASE 
+                WHEN DAYOFWEEK(NOW()) = 2 THEN
+                    DATE(created_at) = CURDATE()
+                ELSE
+                    DATE(created_at) >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+                    AND DATE(created_at) <= CURDATE()
+            END
             AND user_id = ?
     ) AS cd ON DAYNAME(cd.date_formatted) = days.day_name
 GROUP BY 
     days.day_name
 ORDER BY 
     FIELD(days.day_name, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
-
 	`, userID).Rows()
 	if err != nil {
 		return nil, err
@@ -97,72 +105,182 @@ func handleError(w http.ResponseWriter, err error) {
 
 // GetTotalPaymentReceivedByMonth retrieves total payment received by month
 func GetTotalPaymentReceivedByMonth(w http.ResponseWriter, r *http.Request) {
-// Extract user ID from token or wherever it's stored
-userID := userIDFromJWTToken(r)
+	// Extract user ID from token or wherever it's stored
+	userID := userIDFromJWTToken(r)
 
-    // Execute the SQL query
-    rows, err := Database.Raw(`
+	// months.month_name AS month,
+
+	// Execute the SQL query
+	rows, err := Database.Raw(`
 	SELECT 
     COALESCE(SUM(cd.payment_received), 0) AS total_payment_received
 FROM 
     (
-        SELECT 1 AS month_number
-        UNION SELECT 2
-        UNION SELECT 3
-        UNION SELECT 4
-        UNION SELECT 5
-        UNION SELECT 6
-        UNION SELECT 7
-        UNION SELECT 8
-        UNION SELECT 9
-        UNION SELECT 10
-        UNION SELECT 11
-        UNION SELECT 12
+        SELECT 1 AS month_number, 'January' AS month_name
+        UNION SELECT 2, 'February'
+        UNION SELECT 3, 'March'
+        UNION SELECT 4, 'April'
+        UNION SELECT 5, 'May'
+        UNION SELECT 6, 'June'
+        UNION SELECT 7, 'July'
+        UNION SELECT 8, 'August'
+        UNION SELECT 9, 'September'
+        UNION SELECT 10, 'October'
+        UNION SELECT 11, 'November'
+        UNION SELECT 12, 'December'
     ) AS months
 LEFT JOIN 
     (
         SELECT 
-            MONTH(created_at) AS month,
+            MONTH(created_at) AS month_number,
             payment_received
         FROM 
-            posterminal.cart_data
+            posterminal.cart_data d
         WHERE 
-            MONTH(created_at) BETWEEN MONTH(DATE_SUB(CURDATE(), INTERVAL 12 MONTH)) AND MONTH(CURDATE())
-            AND YEAR(created_at) = YEAR(CURDATE())
-            AND user_id = ?
-    ) AS cd ON months.month_number = cd.month
+            YEAR(created_at) = YEAR(CURDATE()) AND user_id = ?
+    ) AS cd ON months.month_number = cd.month_number
 GROUP BY 
-    months.month_number
+    months.month_number, months.month_name
 ORDER BY 
     months.month_number;
-    `,userID).Rows()
+
+    `, userID).Rows()
 	if err != nil {
 		return
 	}
-	
+
 	defer rows.Close()
-    // Extract total payment received by month
-    var totalPayments []int
+	// Extract total payment received by month
+	var totalPayments []int
+	for rows.Next() {
+		var totalPayment int
+		err := rows.Scan(&totalPayment)
+		if err != nil {
+			handleError(w, err)
+			return
+		}
+		totalPayments = append(totalPayments, totalPayment)
+	}
+
+	// Marshal the totalPayments into JSON format
+	jsonData, err := json.Marshal(totalPayments)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	// Write the JSON response
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
+// Struct to represent the response
+type CartDataResponse struct {
+	TotalQuantity         int `json:"total_quantity"`
+	TotalPrice            int `json:"total_price"`
+	TotalPaymentReceived  int `json:"total_payment_received"`
+	TotalRemainingPayment int `json:"total_remaining_payment"`
+}
+
+func handleCartData(w http.ResponseWriter, r *http.Request) {
+    // Extract user ID from token or wherever it's stored
+    userID := userIDFromJWTToken(r)
+
+    // Execute the SQL query
+    var totalQuantity, totalPrice, totalPaymentReceived, totalRemainingPayment int
+    // Execute the SQL query
+    rows, err := Database.Raw(`
+        SELECT 
+            COALESCE(SUM(total_quantity), 0) AS total_quantity,
+            COALESCE(SUM(total_price), 0) AS total_price,
+            COALESCE(SUM(payment_received), 0) AS total_payment_received,
+            COALESCE(SUM(remaining_payment), 0) AS total_remaining_payment
+        FROM 
+            posterminal.cart_data
+        WHERE 
+            user_id = ? AND DATE(created_at) = CURDATE()
+    `, userID).Rows()
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    defer rows.Close()
+
+    // Scan the result into variables
     for rows.Next() {
-        var totalPayment int
-        err := rows.Scan(&totalPayment)
-        if err != nil {
-            handleError(w, err)
+        if err := rows.Scan(&totalQuantity, &totalPrice, &totalPaymentReceived, &totalRemainingPayment); err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
             return
         }
-        totalPayments = append(totalPayments, totalPayment)
     }
 
-    // Marshal the totalPayments into JSON format
-    jsonData, err := json.Marshal(totalPayments)
+    // Create response
+    responseData := []CartDataResponse{{
+        TotalQuantity:         totalQuantity,
+        TotalPrice:            totalPrice,
+        TotalPaymentReceived:  totalPaymentReceived,
+        TotalRemainingPayment: totalRemainingPayment,
+    }}
+
+    // Convert response data to JSON
+    jsonResponse, err := json.Marshal(responseData)
     if err != nil {
-        handleError(w, err)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
 
-    // Write the JSON response
+    // Set response headers and write JSON response
     w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusOK)
-    w.Write(jsonData)
+    w.Write(jsonResponse)
 }
 
+
+type TotalsResponse struct {
+    TotalRecords         int `json:"total_records"`
+    TotalRemainingPayment int `json:"total_remaining_payment"`
+}
+
+// Handler for /combined-totals endpoint
+func combinedTotalsHandler(w http.ResponseWriter, r *http.Request) {
+	userID := userIDFromJWTToken(r)
+    // Execute the SQL query
+    var totalRecords, totalRemainingPayment int
+    rows, err := Database.Raw(`
+        SELECT 
+            (SELECT COUNT(*) FROM posterminal.cart_data WHERE user_id = ? AND DATE(created_at) = CURDATE()) AS total_records,
+            (SELECT SUM(remaining_payment) FROM posterminal.cart_data WHERE user_id = ?) AS total_remaining_payment
+    `, userID, userID).Rows()
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    defer rows.Close()
+
+    // Scan the result into variables
+    for rows.Next() {
+        if err := rows.Scan(&totalRecords, &totalRemainingPayment); err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+    }
+
+    // Create response as a slice containing a single object
+    response := []TotalsResponse{{
+        TotalRecords:         totalRecords,
+        TotalRemainingPayment: totalRemainingPayment,
+    }}
+
+    // Convert response to JSON
+    jsonResponse, err := json.Marshal(response)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    // Set response headers and write JSON response
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+    w.Write(jsonResponse)
+}

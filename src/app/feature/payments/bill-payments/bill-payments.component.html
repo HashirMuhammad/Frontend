@@ -73,7 +73,8 @@
                     <tr [ngClass]="{'row-accessories': product.remainingPayment <= 0}">
                         <td>{{product.id}}</td>
                         <!-- <td>{{product.clientID}}</td> -->
-                        <td>{{product.clientName}}</td>
+                        <td><span *ngIf="product.clientID != 0">Regular Client :</span>
+                            {{product.clientName}}</td>
                         <td>
                             <div [ngClass]="{'outofstock': product.remainingPayment <= 0, 
                             'instock': product.remainingPayment > 0}">

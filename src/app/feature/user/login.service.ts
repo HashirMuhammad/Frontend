@@ -18,6 +18,10 @@ export class LoginService {
     return this.http.post<any>(`${this.apiUrl}/signup`, formData);
   }
 
+  updatePassword(formData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/update-password`, formData);
+  }
+
   logout(): void {
     // remove user from local storage to log user out
     if (typeof window !== "undefined") {

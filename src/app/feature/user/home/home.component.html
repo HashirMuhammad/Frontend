@@ -14,8 +14,10 @@
     </div> -->
     <h3 class="mb-3" style="margin-left: 20px; margin-top: 20px;">Dashboard</h3>
 
-    <div class="mb-3" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));">
-      <div style="display: flex; background-color: #231F20;border-radius: 10px; margin-right: 10px; margin-left: 10px;">
+    <div class="mb-3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;
+     margin-bottom: 10px; margin-right: 10px; margin-left: 10px;" >
+    <ng-container *ngFor="let val of dashboardData">
+      <div style="display: flex; background-color: #231F20;border-radius: 10px;">
         <div style="padding: 5px; display: flex; padding-left: 20px;" class="mt-3">
           <i class="pi pi-money-bill" style="font-size: -webkit-xxx-large;color: #A47B2C;"></i>
         </div>
@@ -23,12 +25,12 @@
           <div>
             <label class=" mt-2 mb-2" style="font-size: 20px;color: #A47B2C;">Sales</label><br />
             <label class=" mb-2" style="font-size: 15px;color: #A47B2C;">
-              <label class="text-white" style="font-size: 20px;">{{totalSale}}</label> .Pkr</label>
+              <label class="text-white" style="font-size: 20px;">{{val.total_price}}</label> .Pkr</label>
           </div>
         </div>
       </div>
 
-      <div style="display: flex; background-color: #231F20;border-radius: 10px; margin-right: 10px;">
+      <div style="display: flex; background-color: #231F20;border-radius: 10px;">
         <div style="padding: 5px; display: flex; padding-left: 20px;" class="mt-3">
           <i class="pi pi-truck " style="font-size: -webkit-xxx-large;color: #A47B2C;"></i>
         </div>
@@ -36,12 +38,41 @@
           <div>
             <label class=" mt-2 mb-2" style="font-size: 20px;color: #A47B2C;">Total items Sold today</label><br />
             <label class=" mb-2" style="font-size: 15px;color: #A47B2C;">
-              <label class="text-white" style="font-size: 20px;">{{totalQuantity}}</label> : Qty</label>
+              <label class="text-white" style="font-size: 20px;">{{val.total_quantity}}</label> : Qty</label>
           </div>
         </div>
       </div>
 
-      <div style="display: flex; background-color: #231F20;border-radius: 10px; margin-right: 10px;">
+      <div style="display: flex; background-color: #231F20;border-radius: 10px;">
+        <div style="padding: 5px; display: flex; padding-left: 20px;" class="mt-3">
+          <i class="pi pi-calculator " style="font-size: -webkit-xxx-large;color: #A47B2C;"></i>
+        </div>
+        <div style="margin-left: auto; margin-right: 10px;">
+          <div>
+            <label class=" mt-2 mb-2" style="font-size: 20px;color: #A47B2C;">Remaining Payment in Today's Date</label><br />
+            <label class=" mb-2" style="font-size: 15px;color: #A47B2C;">
+              <label class="text-white" style="font-size: 20px;">{{val.total_remaining_payment}}</label> .Pkr</label>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; background-color: #231F20;border-radius: 10px;">
+        <div style="padding: 5px; display: flex; padding-left: 20px;" class="mt-3">
+          <i class="pi pi-calculator " style="font-size: -webkit-xxx-large;color: #A47B2C;"></i>
+        </div>
+        <div style="margin-left: auto; margin-right: 10px;">
+          <div>
+            <label class=" mt-2 mb-2" style="font-size: 20px;color: #A47B2C;">Total Payment today</label><br />
+            <label class=" mb-2" style="font-size: 15px;color: #A47B2C;">
+              <label class="text-white" style="font-size: 20px;">{{val.total_payment_received}}</label> .Pkr</label>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+      
+
+    <ng-container *ngFor="let val of dashboardData2">
+      <div style="display: flex; background-color: #231F20;border-radius: 10px;">
         <div style="padding: 5px; display: flex; padding-left: 20px;" class="mt-3">
           <i class="pi pi-credit-card " style="font-size: -webkit-xxx-large;color: #A47B2C;"></i>
         </div>
@@ -49,23 +80,28 @@
           <div>
             <label class=" mt-2 mb-2" style="font-size: 20px;color: #A47B2C;">Bills</label><br />
             <label class=" mb-2" style="font-size: 15px;color: #A47B2C;">
-              <label class="text-white" style="font-size: 20px;">{{billsLength}}</label></label>
+              <label class="text-white" style="font-size: 20px;">{{val.total_records}}</label></label>
           </div>
         </div>
       </div>
 
-      <div style="display: flex; background-color: #231F20;border-radius: 10px; margin-right: 10px;">
+      <div style="display: flex; background-color: #231F20;border-radius: 10px;">
         <div style="padding: 5px; display: flex; padding-left: 20px;" class="mt-3">
           <i class="pi pi-calculator " style="font-size: -webkit-xxx-large;color: #A47B2C;"></i>
         </div>
         <div style="margin-left: auto; margin-right: 10px;">
           <div>
-            <label class=" mt-2 mb-2" style="font-size: 20px;color: #A47B2C;">Remaining Payment</label><br />
+            <label class=" mt-2 mb-2" style="font-size: 20px;color: #A47B2C;">Remaining Payments</label><br />
             <label class=" mb-2" style="font-size: 15px;color: #A47B2C;">
-              <label class="text-white" style="font-size: 20px;">{{remainingPayment}}</label> .Pkr from Clients</label>
+              <label class="text-white" style="font-size: 20px;">{{val.total_remaining_payment}}</label> .Pkr from Clients</label>
           </div>
         </div>
       </div>
+    </ng-container>
+
+      
+
+      
     </div>
 
     <div class="p-5" style="display: flex; gap: 5.5rem;">

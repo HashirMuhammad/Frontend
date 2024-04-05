@@ -138,3 +138,59 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonResponse)
 }
+
+// ChangePassword handles changing user's password
+func ChangePassword(w http.ResponseWriter, r *http.Request) {
+	// Decode the request body to get user credentials
+	var passwordChangeRequest struct {
+		Email           string `json:"email"`
+		CurrentPassword string `json:"current_password"`
+		NewPassword     string `json:"new_password"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&passwordChangeRequest); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Check if the email exists in the database
+	user, err := GetUserByEmail(passwordChangeRequest.Email)
+	if err != nil {
+		http.Error(w, "Failed to check email availability", http.StatusInternalServerError)
+		return
+	}
+	if user == nil {
+		http.Error(w, "Email not found", http.StatusNotFound)
+		return
+	}
+
+	// Compare the hashed password from the database with the provided current password
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(passwordChangeRequest.CurrentPassword)); err != nil {
+		http.Error(w, "Invalid current password", http.StatusUnauthorized)
+		return
+	}
+
+	// Hash the new password
+	hashedNewPassword, err := bcrypt.GenerateFromPassword([]byte(passwordChangeRequest.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Update the user's password in the database
+	user.Password = string(hashedNewPassword)
+	if err := Database.Save(&user).Error; err != nil {
+		http.Error(w, "Failed to update password", http.StatusInternalServerError)
+		return
+	}
+
+	// Return success message
+	responseData := Response{Message: "Password updated successfully"}
+	jsonData, err := json.Marshal(responseData)
+	if err != nil {
+		http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonData)
+}

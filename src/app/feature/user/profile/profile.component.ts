@@ -2,9 +2,9 @@ import { Component, OnInit } from "@angular/core";
 import { UserService } from "../../../core/services/user.service";
 import { User } from "../../../core/models/user.interface";
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from "@angular/forms";
-// import { ToastrService } from "ngx-toastr";
 import { Router } from "@angular/router";
-import { ValidationService } from "../../../core/components/validation-errors/validation-messages.service";
+import { HomeServiceService } from "../home-service.service";
+import { LoginService } from "../login.service";
 
 @Component({
   selector: "app-profile",
@@ -12,56 +12,52 @@ import { ValidationService } from "../../../core/components/validation-errors/va
   styleUrls: ["./profile.component.scss"]
 })
 export class ProfileComponent implements OnInit {
-  user: User;
   passwordForm: UntypedFormGroup;
+
   constructor(
-    private usreService: UserService,
     private formBuilder: UntypedFormBuilder,
-    private validationService: ValidationService,
+    private loginservice: LoginService,
     // private toastrService: ToastrService,
     private router: Router
   ) {}
-  createPasswordForm() {
-    this.passwordForm = this.formBuilder.group(
-      {
-        name: ["", Validators.required],
-        password: ["", [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ["", Validators.required]
-      },
-      {
-        validator: this.validationService.MustMatch("password", "confirmPassword")
-      }
-    );
-  }
-
-
-  resetPasswordForm() {
-    this.passwordForm.reset();
-    this.passwordForm.get("name").patchValue(this.user.name);
-  }
-  updatePassword() {
-    this.usreService.changePassword(this.user._id, this.passwordForm.get("password").value).subscribe(
-      (data) => {
-        // this.toastrService.success("Profile updated successful");
-        this.router.navigate(["/login"]);
-      },
-      (error) => {}
-    );
-  }
 
   ngOnInit(): void {
-    this.getCurrentuser();
-    this.createPasswordForm();
-    this.user = this.usreService.getCurrentUser();
-    this.passwordForm.get("name").patchValue(this.user.name);
+    this.passwordForm = this.formBuilder.group({
+      email: ['', Validators.required], // Assuming you want to display the user's name
+      currentpassword: ['', Validators.required],
+      newPassword: ['', Validators.required]
+    });
+  }
 
+    updatePassword() {
+      if (this.passwordForm.invalid) {
+        return;
+      }
+  
+      const formData = {
+        email: this.passwordForm.value.email, // Get user's email from somewhere or pass it as a parameter
+        current_password: this.passwordForm.value.currentpassword,
+        new_password: this.passwordForm.value.newPassword
+      };
+  
+      this.loginservice.updatePassword(formData).subscribe(
+        (data) => {
+          console.log(data);
+        localStorage.removeItem('currentUser')
+          this.router.navigate(['login'])
+  
+          // Optionally, perform any other action upon successful deletion
+        },
+        (error) => {
+          console.error("Error deleting product:", error);
+          // Handle error appropriately, e.g., display an error message to the user
+        }
+      );
+    }
+  
+  
+  resetPasswordForm() {
+    this.passwordForm.reset();
   }
-  getCurrentuser(){
-    this.usreService.getCurrentUserProfile().subscribe(
-      (data) => {
-       console.log("User Profile", data);
-      },
-      (error) => {}
-    );
-  }
+  
 }

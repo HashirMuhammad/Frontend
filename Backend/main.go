@@ -13,6 +13,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/signup", Signup).Methods("POST")
 	r.HandleFunc("/login", Login).Methods("POST")
+	r.HandleFunc("/update-password", ChangePassword).Methods("POST")
 	r.HandleFunc("/save-client", CreateClientHandler).Methods("POST")
 	r.HandleFunc("/clients", GetClientsHandler).Methods("GET")
 	r.HandleFunc("/clients-id-name", GetClientsNameIDHandler).Methods("GET")
@@ -36,6 +37,8 @@ func main() {
 	r.HandleFunc("/get-remaining-payment-clients", GetRemainingPaymentOfClientsUnique).Methods("GET")
 	r.HandleFunc("/daily-sales", GetCartData).Methods("GET")
 	r.HandleFunc("/monthly-sales", GetTotalPaymentReceivedByMonth).Methods("GET")
+	r.HandleFunc("/dashboard-data", handleCartData).Methods("GET")
+	r.HandleFunc("/combined-totals", combinedTotalsHandler).Methods("GET")
 
 	// Create a file server instance to serve files from the "static" directory
 	fs := http.FileServer(http.Dir("static"))
